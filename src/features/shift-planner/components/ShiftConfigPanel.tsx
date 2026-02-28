@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card } from '../../../components/ui/Card'
 import type { Employee } from '../../../models/Employee'
-import { GenerateScheduleButton } from './GenerateScheduleButton'
+import { GenerateScheduleButton } from './buttons/GenerateScheduleButton'
 import { PresentEmployeesList } from './PresentEmployeesList'
 import { ShiftDateSelector } from './ShiftDateSelector'
 import { ShiftTypeSelector, type ShiftType } from './ShiftTypeSelector'

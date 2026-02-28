@@ -1,8 +1,8 @@
 import { Card } from '../../../components/ui/Card'
 import type { Employee } from '../../../models/Employee'
 import type { Role } from '../../../models/Role'
-import { ExportCsvButton } from './ExportCsvButton'
-import { SavePlanButton } from './SavePlanButton'
+import { ExportCsvButton } from './buttons/ExportCsvButton'
+import { SavePlanButton } from './buttons/SavePlanButton'
 import { ScheduleTable } from './ScheduleTable'
 
 interface ScheduleItem {
