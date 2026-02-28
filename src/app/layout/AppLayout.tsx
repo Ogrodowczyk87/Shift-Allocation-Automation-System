@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Navbar } from '../../components/ui/Navbar'
-import { Sidebar, type Page } from './Sidebar'
+import { Sidebar } from './Sidebar'
+import type { Page } from './page.types'
 
 interface AppLayoutProps {
   activePage: Page

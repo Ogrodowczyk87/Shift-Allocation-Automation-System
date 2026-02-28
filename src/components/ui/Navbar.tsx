@@ -1,4 +1,4 @@
-import type { Page } from '../../app/layout/Sidebar'
+import type { Page } from '../../app/layout/page.types'
 interface NavbarProps {
   activePage: Page
   onSelectPage: (page: Page) => void
@@ -10,9 +10,6 @@ const NAV_ITEMS: Array<{ id: Page; label: string }> = [
   { id: 'history', label: 'History' },
   { id: 'reports', label: 'Reports' },
 ]
-
-
-
 
 export function Navbar({ activePage, onSelectPage }: NavbarProps) {
   return (

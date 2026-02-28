@@ -1,4 +1,4 @@
-export type Page = 'shift-planner' | 'people' | 'history' | 'reports' | 'settings'
+import type { Page } from './page.types'
 
 const SIDEBAR_ITEMS: Array<{ id: Page; label: string }> = [
   { id: 'shift-planner', label: 'Shift Planner' },
