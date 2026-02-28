@@ -6,5 +6,5 @@ interface TableRowProps {
 }
 
 export function TableRow({ children, className = '' }: TableRowProps) {
-  return <tr className={`border-t border-slate-800 ${className}`.trim()}>{children}</tr>
+  return <tr className={`border-t border-sky-100 ${className}`.trim()}>{children}</tr>
 }

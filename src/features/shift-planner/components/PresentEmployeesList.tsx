@@ -10,7 +10,7 @@ interface PresentEmployeesListProps {
 export function PresentEmployeesList({ employees, selectedIds, onToggle }: PresentEmployeesListProps) {
   return (
     <section className="flex flex-col gap-2">
-      <h3 className="text-sm font-medium text-slate-200">Present employees</h3>
+      <h3 className="text-sm font-medium text-sky-900">Present employees</h3>
       <div className="grid gap-2 sm:grid-cols-2">
         {employees.map((employee) => (
           <EmployeeCheckboxItem

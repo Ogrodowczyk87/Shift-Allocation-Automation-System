@@ -47,7 +47,7 @@ export function ShiftConfigPanel() {
 
   return (
     <Card>
-      <h2 className="text-lg font-semibold text-white">Shift Configuration</h2>
+      <h2 className="text-lg font-semibold text-sky-900">Shift Configuration</h2>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <ShiftDateSelector

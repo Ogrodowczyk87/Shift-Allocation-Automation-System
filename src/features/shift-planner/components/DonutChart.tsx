@@ -17,7 +17,7 @@ export function DonutChart({ percentage, size = 112, strokeWidth = 12 }: DonutCh
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke="rgb(51 65 85)"
+        stroke="rgb(191 219 254)"
         strokeWidth={strokeWidth}
       />
       <circle
@@ -25,7 +25,7 @@ export function DonutChart({ percentage, size = 112, strokeWidth = 12 }: DonutCh
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke="rgb(56 189 248)"
+        stroke="rgb(2 132 199)"
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeDasharray={circumference}

@@ -56,7 +56,7 @@ export function GeneratedSchedulePanel() {
 
   return (
     <Card>
-      <h2 className="text-lg font-semibold text-white">Generated Schedule</h2>
+      <h2 className="text-lg font-semibold text-sky-900">Generated Schedule</h2>
 
       <div className="mt-4">
         <ScheduleTable rows={SCHEDULE_ROWS} />
