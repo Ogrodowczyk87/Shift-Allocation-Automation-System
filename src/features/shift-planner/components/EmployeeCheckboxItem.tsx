@@ -1,3 +1,4 @@
+import { Checkbox } from '../../../components/ui/Checkbox'
 import type { Employee } from '../../../models/Employee'
 
 export interface EmployeeCheckboxItemProps {
@@ -8,14 +9,10 @@ export interface EmployeeCheckboxItemProps {
 
 export function EmployeeCheckboxItem({ employee, checked, onToggle }: EmployeeCheckboxItemProps) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-slate-200 hover:border-slate-700">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={() => onToggle(employee.id)}
-        className="h-4 w-4 accent-sky-400"
-      />
-      <span>{employee.firstName} {employee.lastName}</span>
-    </label>
+    <Checkbox
+      label={`${employee.firstName} ${employee.lastName}`}
+      checked={checked}
+      onChange={() => onToggle(employee.id)}
+    />
   )
 }

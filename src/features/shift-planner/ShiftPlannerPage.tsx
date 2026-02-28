@@ -4,10 +4,20 @@ import { StatsSection } from './components/StatsSection'
 
 export function ShiftPlannerPage() {
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 sm:px-6">
-      <ShiftConfigPanel />
-      <GeneratedSchedulePanel />
-      <StatsSection />
+    <section>
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Shift Planner</h1>
+        <p className="mt-2 text-slate-300">Configure shifts, review assignments, and monitor coverage.</p>
+      </header>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ShiftConfigPanel />
+        <GeneratedSchedulePanel />
+      </div>
+
+      <div className="mt-4">
+        <StatsSection />
+      </div>
     </section>
   )
 }

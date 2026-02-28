@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Card } from '../../../components/ui/Card'
 import type { Employee } from '../../../models/Employee'
 import { GenerateScheduleButton } from './GenerateScheduleButton'
 import { PresentEmployeesList } from './PresentEmployeesList'
@@ -8,8 +9,8 @@ import { ShiftTypeSelector, type ShiftType } from './ShiftTypeSelector'
 const EMPLOYEES: Employee[] = [
   { id: 'e1', firstName: 'Anna', lastName: 'Kowalska' },
   { id: 'e2', firstName: 'Jan', lastName: 'Nowak' },
-  { id: 'e3', firstName: 'Maria', lastName: 'Wiśniewska' },
-  { id: 'e4', firstName: 'Piotr', lastName: 'Wójcik' },
+  { id: 'e3', firstName: 'Maria', lastName: 'Wisniewska' },
+  { id: 'e4', firstName: 'Piotr', lastName: 'Wojcik' },
 ]
 
 function createDateOptions(): string[] {
@@ -45,7 +46,7 @@ export function ShiftConfigPanel() {
   }
 
   return (
-    <section className="rounded-lg border border-slate-800 bg-slate-900 p-4">
+    <Card>
       <h2 className="text-lg font-semibold text-white">Shift Configuration</h2>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -68,6 +69,6 @@ export function ShiftConfigPanel() {
       <div className="mt-4">
         <GenerateScheduleButton onClick={handleGenerate} />
       </div>
-    </section>
+    </Card>
   )
 }
