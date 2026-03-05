@@ -26,10 +26,10 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-        <div>
-    <PhotoUpload onChange={setPhotoUrl} />
-        </div>
       <div>
+        <PhotoUpload onChange={setPhotoUrl} />
+      </div>
+      <div className="grid gap-4">
         <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-slate-700">
           First name
         </label>
@@ -37,13 +37,13 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
           id="firstName"
           value={firstName}
           onChange={(event) => setFirstName(event.target.value)}
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none ring-sky-300 focus:ring-2"
+          className="w-full rounded-md border px-3 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="first name"
           required
         />
       </div>
 
-      <div>
+      <div className="grid gap-4">
         <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-slate-700">
           Last name
         </label>
@@ -51,12 +51,12 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
           id="lastName"
           value={lastName}
           onChange={(event) => setLastName(event.target.value)}
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none ring-sky-300 focus:ring-2"
+          className="w-full rounded-md border px-3 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="last name"
           required
         />
       </div>
-      <div>
+      <div className="grid gap-4">
         <label htmlFor="id" className="mb-1 block text-sm font-medium text-slate-700">
           ID
         </label>
@@ -64,10 +64,29 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
           id="id"
           value={id}
           onChange={(event) => setId(event.target.value)}
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none ring-sky-300 focus:ring-2"
+          className="w-full rounded-md border px-3 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="employee ID"
           required
         />
+      </div>
+      <div className="grid gap-2">
+        <p className="text-sm font-medium text-slate-700">Trainings</p>
+        <label htmlFor="training-stov" className="flex w-fit cursor-pointer items-center gap-2 rounded-md bg-yellow-50 px-2 py-1 text-sm text-slate-700">
+          <input type="checkbox" id="training-stov" className="h-4 w-4 accent-yellow-700" />
+          Stov
+        </label>
+        <label htmlFor="training-induct" className="flex w-fit cursor-pointer items-center gap-2 rounded-md bg-rose-50 px-2 py-1 text-sm text-slate-700">
+          <input type="checkbox" id="training-induct" className="h-4 w-4 accent-rose-600" />
+          Induct
+        </label>
+        <label htmlFor="training-problem-solve" className="flex w-fit cursor-pointer items-center gap-2 rounded-md bg-emerald-50 px-2 py-1 text-sm text-slate-700">
+          <input type="checkbox" id="training-problem-solve" className="h-4 w-4 accent-emerald-600" />
+          Problem Solve
+        </label>
+        <label htmlFor="training-divert" className="flex w-fit cursor-pointer items-center gap-2 rounded-md bg-sky-50 px-2 py-1 text-sm text-slate-700">
+          <input type="checkbox" id="training-divert" className="h-4 w-4 accent-sky-600" />
+          Divert
+        </label>
       </div>
 
       <div className="pt-2">
