@@ -1,5 +1,5 @@
 
-const TRAININGS_OPTIONS = ['Stov', 'Induct', 'Forklift'] as const
+export const TRAININGS_OPTIONS = ['Stov', 'Induct', 'Problem Solving', 'Divert'] as const
 export type Training = typeof TRAININGS_OPTIONS[number]
 
 export const EMPLOYEE_STATUSES_OPTIONS = ['active', 'inactive'] as const
