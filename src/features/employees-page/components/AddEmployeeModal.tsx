@@ -4,14 +4,14 @@ import { AddEmployeeForm } from "./AddEmployeeForm"
 type Props = {
   isOpen: boolean
   onClose: () => void
+  onAddEmployee: (employee: Employee) => void
 }
 
-export function AddEmployeeModal({ isOpen, onClose }: Props) {
+export function AddEmployeeModal({ isOpen, onClose, onAddEmployee }: Props) {
   if (!isOpen) return null
 
-  const handleSubmit = (employee: Omit<Employee, "id">) => {
-    // Placeholder for API/store integration.
-    console.log("New employee:", employee)
+  const handleSubmit = (employee: Employee) => {
+    onAddEmployee(employee)
     onClose()
   }
 
@@ -24,5 +24,3 @@ export function AddEmployeeModal({ isOpen, onClose }: Props) {
     </div>
   )
 }
-
-export default AddEmployeeModal

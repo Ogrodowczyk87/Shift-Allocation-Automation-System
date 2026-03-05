@@ -1,8 +1,13 @@
 import { useState } from "react"
+import type { Employee } from "../../models/Employee"
 import { AddEmpyeeCard } from "./components/AddEmpyeeCard"
 import { AddEmployeeModal } from "./components/AddEmployeeModal"
 
-export const AddEmployee = () => {
+type Props = {
+  onAddEmployee: (employee: Employee) => void
+}
+
+export const AddEmployee = ({ onAddEmployee }: Props) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -12,6 +17,7 @@ export const AddEmployee = () => {
       <AddEmployeeModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
+        onAddEmployee={onAddEmployee}
       />
     </>
   )

@@ -5,23 +5,29 @@ import { PhotoUpload } from "../../../components/ui/FileUploadInput"
 
 type AddEmployeeFormProps = {
   onCancel: () => void
-  onSubmit: (employee: Omit<Employee, "id">) => void
+  onSubmit: (employee: Employee) => void
 }
 
 export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [id, setId] = useState("")
+  const [photoUrl, setPhotoUrl] = useState("")
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    onSubmit({ firstName: firstName.trim(), lastName: lastName.trim() })
+    onSubmit({
+      id: id.trim(),
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      photoUrl: photoUrl.trim() || undefined,
+    })
   }
 
   return (
     <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <div>
-            <PhotoUpload />
+    <PhotoUpload onChange={setPhotoUrl} />
         </div>
       <div>
         <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-slate-700">

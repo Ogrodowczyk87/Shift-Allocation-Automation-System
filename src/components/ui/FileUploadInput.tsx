@@ -1,6 +1,10 @@
 import { useRef, useState } from "react"
 
-export function PhotoUpload() {
+type Props = {
+  onChange?: (url: string) => void
+}
+
+export function PhotoUpload({ onChange }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fileName, setFileName] = useState("")
@@ -11,8 +15,10 @@ export function PhotoUpload() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    const url = URL.createObjectURL(file)
     setFileName(file.name)
-    setPreviewUrl(URL.createObjectURL(file))
+    setPreviewUrl(url)
+    onChange?.(url)
   }
 
   return (
