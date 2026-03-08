@@ -3,17 +3,27 @@ import { AddEmployee } from './AddEmployee'
 import type { Employee, EmployeeStatus, Training } from '../../models/Employee'
 import { TRAININGS_OPTIONS } from "../../models/Employee"
 
+type EmployeesPageProps = {
+  employees: Employee[]
+  onAddEmployee: (employee: Employee) => void
+  onAddEmployeesToPool: (ids: string[]) => void
+}
 
-export function EmployeesPage() {
-   const [employees, setEmployees] = useState<Employee[]>([])
+export function EmployeesPage({
+  employees,
+  onAddEmployee,
+  onAddEmployeesToPool,
+}: EmployeesPageProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const [trainingFilter, setTrainingFilter] = useState<"All Trainings" | Training>("All Trainings")
   const [statusFilter, setStatusFilter] = useState<"All Statuses" | EmployeeStatus>("All Statuses")
   const [search, setSearch] = useState("")
 
-  const handleAddEmployee = (employee: Employee) => {
-    setEmployees((prev) => [...prev, employee])
+  const handleAllocateSelected = () => {
+    if (selectedIds.length === 0) return
+    onAddEmployeesToPool(selectedIds)
+    setSelectedIds([])
   }
 
   const filteredEmployees = useMemo(() => {
@@ -66,8 +76,8 @@ export function EmployeesPage() {
 
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="rounded-md border px-3 py-2">
               <option>All Statuses</option>
-              <option>Active</option>
-              <option>Inactive</option>
+              <option value="active">active</option>
+              <option value="inactive">inactive</option>
             </select>
 
             <input
@@ -90,6 +100,13 @@ export function EmployeesPage() {
               </button>
               <button onClick={() => setSelectedIds([])} className="rounded-md border bg-white px-3 py-1 text-sm">
                 Clear selection
+              </button>
+              <button
+                onClick={handleAllocateSelected}
+                disabled={selectedIds.length === 0}
+                className="rounded-md border bg-sky-600 px-3 py-1 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Add selected to pool
               </button>
             </div>
           </div>
@@ -132,13 +149,16 @@ export function EmployeesPage() {
                 <span className="ml-auto rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
                   {employee.status}
                 </span>
+                {employee.active ? (
+                  <span className="rounded bg-sky-100 px-2 py-0.5 text-xs text-sky-700">In pool</span>
+                ) : null}
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      <AddEmployee onAddEmployee={handleAddEmployee} />
+      <AddEmployee onAddEmployee={onAddEmployee} />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import type { FormEventHandler } from "react"
 import type { Employee, EmployeeStatus, Training } from "../../../models/Employee"
-import { EMPLOYEE_STATUSES_OPTIONS, TRAININGS_OPTIONS } from "../../../models/Employee"
+import { TRAININGS_OPTIONS } from "../../../models/Employee"
 import { PhotoUpload } from "../../../components/ui/FileUploadInput"
 
 type AddEmployeeFormProps = {
@@ -26,6 +26,7 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
       photoUrl: photoUrl.trim() || undefined,
       trainings,
       status,
+      active: false,
     })
   }
 

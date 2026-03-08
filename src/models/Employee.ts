@@ -12,4 +12,20 @@ export interface Employee {
   photoUrl?: string
   trainings: Training[]
   status: EmployeeStatus
+  active: boolean
 }
+
+export interface Slot {
+  id: string
+  area: "A" | "B" | "C" | "D"
+  aisle: number,
+  location: number,
+  assignetEmployeeId?: string | null
+}
+
+export type AllocationState = {
+  employees: Employee[];
+  slots: Slot[];
+};
+
+
