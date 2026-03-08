@@ -13,7 +13,7 @@ const NAV_ITEMS: Array<{ id: Page; label: string }> = [
 
 export function Navbar({ activePage, onSelectPage }: NavbarProps) {
   return (
-    <header className="border-b border-sky-200 bg-blue-500 backdrop-blur">
+    <header className="border-b border-sky-200 bg-[#090979] bg-[linear-gradient(90deg,_rgba(9,9,121,1)_35%,_rgba(0,212,255,1)_100%)] backdrop-blur">
       <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
         <a href="#" className="text-lg font-semibold tracking-tight text-white">
           Shift Allocation System

@@ -11,12 +11,15 @@ interface AppLayoutProps {
 
 export function AppLayout({ activePage, onSelectPage, children }: AppLayoutProps) {
   return (
-    <div className="min-h-screen bg-sky-50 text-slate-900">
+    <div className="flex min-h-screen flex-col bg-sky-50 text-slate-900">
       <Navbar activePage={activePage} onSelectPage={onSelectPage} />
-      <div className="mx-auto flex w-full max-w-7xl">
+      <div className="mx-auto flex w-full max-w-7xl flex-1">
         <Sidebar activePage={activePage} onSelectPage={onSelectPage} />
         <main className="min-h-[calc(100vh-4rem)] flex-1 px-4 py-6 sm:px-6">{children}</main>
       </div>
+      <footer className="border-t border-sky-200 bg-white/80 px-4 py-3 text-center text-sm text-slate-600">
+        © 2026 Rafal. This project is owned and created by me.
+      </footer>
     </div>
   )
 }
