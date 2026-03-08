@@ -3,7 +3,7 @@ import { AppLayout } from './app/layout/AppLayout'
 import type { Page } from './app/layout/page.types'
 import { AllocationPage } from './features/AllocationPage/AllocationPage'
 import { EmployeesPage } from './features/employees-page/EmployeesPage'
-import type { Employee } from './models/Employee'
+import type { Employee, Training } from './models/Employee'
 import { ReportsPage } from './features/reports-page/ReportsPage'
 import { ShiftPlannerPage } from './features/shift-planner/ShiftPlannerPage'
 import { SettingsPage } from './features/setting-page/settings'
@@ -30,12 +30,16 @@ const SEEDED_EMPLOYEES: Employee[] = Array.from({ length: 42 }, (_, index) => {
   const firstName = SEEDED_FIRST_NAMES[index]
   const lastName = SEEDED_LAST_NAMES[index]
   const photoId = ((number - 1) % 70) + 1
+  const trainings: Training[] =
+    number % 3 === 0
+      ? ['Stov', 'Induct', 'Divert', 'Problem Solving']
+      : ['Stov', 'Induct', 'Divert']
   return {
     id,
     firstName,
     lastName,
     photoUrl: `https://i.pravatar.cc/150?img=${photoId}`,
-    trainings: [],
+    trainings,
     status: 'active',
     active: true,
   }
