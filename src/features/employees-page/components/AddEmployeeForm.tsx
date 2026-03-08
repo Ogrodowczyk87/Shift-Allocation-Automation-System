@@ -3,6 +3,7 @@ import type { FormEventHandler } from "react"
 import type { Employee, EmployeeStatus, Training } from "../../../models/Employee"
 import { TRAININGS_OPTIONS } from "../../../models/Employee"
 import { PhotoUpload } from "../../../components/ui/FileUploadInput"
+import { buildEmployeeAvatarUrl } from "../../../utils/employeeAvatar"
 
 type AddEmployeeFormProps = {
   onCancel: () => void
@@ -19,11 +20,20 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault()
+    const normalizedFirstName = firstName.trim()
+    const normalizedLastName = lastName.trim()
+    const normalizedId = id.trim()
     onSubmit({
-      id: id.trim(),
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      photoUrl: photoUrl.trim() || undefined,
+      id: normalizedId,
+      firstName: normalizedFirstName,
+      lastName: normalizedLastName,
+      photoUrl:
+        photoUrl.trim() ||
+        buildEmployeeAvatarUrl({
+          id: normalizedId,
+          firstName: normalizedFirstName,
+          lastName: normalizedLastName,
+        }),
       trainings,
       status,
       active: false,

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { AddEmployee } from './AddEmployee'
 import type { Employee, EmployeeStatus, Training } from '../../models/Employee'
 import { TRAININGS_OPTIONS } from "../../models/Employee"
+import { buildEmployeeAvatarUrl, resolveEmployeePhotoUrl } from '../../utils/employeeAvatar'
 
 type EmployeesPageProps = {
   employees: Employee[]
@@ -63,7 +64,7 @@ export function EmployeesPage({
   }
 
   return (
-    <div className="flex gap-4">
+    <div className="flex items-start gap-4">
       <section className="flex-1 rounded-lg border border-sky-200 bg-white p-6 text-slate-900">
         <h1 className="text-xl font-semibold">Employees</h1>
 
@@ -126,8 +127,12 @@ export function EmployeesPage({
                 />
 
                 <img
-                  src={employee.photoUrl || "https://via.placeholder.com/40?text=+"}
+                  src={resolveEmployeePhotoUrl(employee)}
                   alt={`${employee.firstName} ${employee.lastName}`}
+                  onError={(event) => {
+                    event.currentTarget.onerror = null
+                    event.currentTarget.src = buildEmployeeAvatarUrl(employee)
+                  }}
                   className="h-10 w-10 rounded-full object-cover"
                 />
 

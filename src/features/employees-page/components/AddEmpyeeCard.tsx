@@ -6,7 +6,10 @@ type props = {
 
 export function AddEmpyeeCard({onClick}: props) {
   return (
-    <div onClick={onClick} className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-sky-200 bg-white p-6 text-slate-900">
+    <div
+      onClick={onClick}
+      className="flex h-56 w-72 shrink-0 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-sky-200 bg-white p-6 text-slate-900"
+    >
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 text-sky-700">
             +
         </div>

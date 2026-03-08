@@ -1,4 +1,5 @@
 import type { Employee, Slot } from '../../../models/Employee'
+import { buildEmployeeAvatarUrl, resolveEmployeePhotoUrl } from '../../../utils/employeeAvatar'
 
 type AllocationBoardProps = {
   slots: Slot[]
@@ -21,13 +22,29 @@ export function AllocationBoard({ slots, employeesById }: AllocationBoardProps) 
               <p className="text-xs font-semibold text-sky-700">
                 Area {slot.area} / Location {slot.aisle}-{slot.location}
               </p>
-              {assignedEmployee ? (
-                <p className="mt-2 text-sm font-medium text-slate-900">
-                  {assignedEmployee.firstName} {assignedEmployee.lastName}
-                </p>
-              ) : (
-                <p className="mt-2 text-sm text-slate-500">Unassigned</p>
-              )}
+              <div className="mt-3 flex items-center gap-3 rounded-md bg-slate-50 p-2">
+                <img
+                  src={assignedEmployee ? resolveEmployeePhotoUrl(assignedEmployee) : 'https://via.placeholder.com/36?text=%2B'}
+                  alt={assignedEmployee ? `${assignedEmployee.firstName} ${assignedEmployee.lastName}` : 'Unassigned slot'}
+                  onError={(event) => {
+                    event.currentTarget.onerror = null
+                    event.currentTarget.src = assignedEmployee
+                      ? buildEmployeeAvatarUrl(assignedEmployee)
+                      : 'https://via.placeholder.com/36?text=%2B'
+                  }}
+                  className="h-9 w-9 rounded-full object-cover"
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-slate-900">
+                    {assignedEmployee
+                      ? `${assignedEmployee.firstName} ${assignedEmployee.lastName}`
+                      : 'Unassigned'}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {assignedEmployee ? `ID: ${assignedEmployee.id}` : 'ID: -'}
+                  </p>
+                </div>
+              </div>
             </article>
           )
         })}

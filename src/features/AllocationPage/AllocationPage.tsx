@@ -4,6 +4,7 @@ import { ActiveEmployeesPanel } from './components/ActiveEmployeesPanel'
 import { AllocationBoard } from './components/AllocationBoard'
 import { AllocationToolbar } from './components/AllocationToolbar'
 import { LegendBar } from './components/LegendBar'
+import { UnassignedEmployeesPanel } from './components/UnassignedEmployeesPanel'
 
 type AllocationPageProps = {
   employees: Employee[]
@@ -51,6 +52,15 @@ export function AllocationPage({ employees }: AllocationPageProps) {
     [employees]
   )
 
+  const unassignedEmployees = useMemo(() => {
+    const assignedIds = new Set(
+      slots
+        .map((slot) => slot.assignetEmployeeId)
+        .filter((employeeId): employeeId is string => Boolean(employeeId))
+    )
+    return activeEmployees.filter((employee) => !assignedIds.has(employee.id))
+  }, [activeEmployees, slots])
+
   const handleAllocate = () => {
     setSlots((currentSlots) =>
       currentSlots.map((slot, index) => ({
@@ -65,7 +75,10 @@ export function AllocationPage({ employees }: AllocationPageProps) {
       <AllocationToolbar poolCount={activeEmployees.length} onAllocate={handleAllocate} />
 
       <div className="grid grid-cols-3 gap-6">
-        <ActiveEmployeesPanel employees={activeEmployees} />
+        <div className="space-y-6">
+          <ActiveEmployeesPanel employees={activeEmployees} />
+          <UnassignedEmployeesPanel employees={unassignedEmployees} />
+        </div>
 
         <div className="col-span-2">
           <AllocationBoard slots={slots} employeesById={employeesById} />
