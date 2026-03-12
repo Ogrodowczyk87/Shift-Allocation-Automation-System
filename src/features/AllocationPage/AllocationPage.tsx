@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { Employee, Slot } from '../../models/Employee'
-import { ActiveEmployeesPanel } from './components/ActiveEmployeesPanel'
+// import { ActiveEmployeesPanel } from './components/ActiveEmployeesPanel'
 import { AllocationBoard } from './components/AllocationBoard'
 import { AllocationToolbar } from './components/AllocationToolbar'
 import { LegendBar } from './components/LegendBar'
@@ -76,14 +76,14 @@ export function AllocationPage({ employees }: AllocationPageProps) {
 
       <div className="grid grid-cols-3 gap-6">
         <div className="space-y-6">
-          <ActiveEmployeesPanel employees={activeEmployees} />
-          <UnassignedEmployeesPanel employees={unassignedEmployees} />
+          {/* <ActiveEmployeesPanel employees={activeEmployees} /> */}
+          {/* <UnassignedEmployeesPanel employees={unassignedEmployees} /> */}
         </div>
+      </div>
 
         <div className="col-span-2">
           <AllocationBoard slots={slots} employeesById={employeesById} />
         </div>
-      </div>
 
       <LegendBar />
     </div>
