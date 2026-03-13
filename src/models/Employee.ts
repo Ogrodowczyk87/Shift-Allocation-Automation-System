@@ -1,4 +1,3 @@
-
 export const TRAININGS_OPTIONS = ['Stov', 'Induct', 'Problem Solving', 'Divert'] as const
 export type Training = typeof TRAININGS_OPTIONS[number]
 
@@ -29,4 +28,10 @@ export type AllocationState = {
   slots: Slot[];
 };
 
-
+export interface SpecialTask {
+  id: string
+  name: string
+  group: string
+  active: boolean
+  assignedEmployeeId?: string | null
+}
