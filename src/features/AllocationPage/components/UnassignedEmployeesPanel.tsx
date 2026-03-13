@@ -14,7 +14,7 @@ export function UnassignedEmployeesPanel({ employees }: UnassignedEmployeesPanel
       {employees.length === 0 ? (
         <p className="mt-4 text-sm text-slate-500">All pool employees are assigned.</p>
       ) : (
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
           {employees.map((employee) => (
             <li key={employee.id} className="flex items-center gap-3 rounded-md border border-slate-200 px-3 py-2 text-sm">
               <img
@@ -26,11 +26,11 @@ export function UnassignedEmployeesPanel({ employees }: UnassignedEmployeesPanel
                 }}
                 className="h-9 w-9 rounded-full object-cover"
               />
-              <div>
-                <p className="font-medium text-slate-900">
+              <div className="min-w-0">
+                <p className="truncate font-medium text-slate-900">
                   {employee.firstName} {employee.lastName}
                 </p>
-                <p className="text-slate-500">#{employee.id}</p>
+                <p className="truncate text-slate-500">#{employee.id}</p>
               </div>
             </li>
           ))}

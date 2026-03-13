@@ -20,6 +20,7 @@ export interface Slot {
   area: "A" | "B" | "C" | "D"
   aisle: number,
   location: number,
+  active: boolean,
   assignetEmployeeId?: string | null
 }
 

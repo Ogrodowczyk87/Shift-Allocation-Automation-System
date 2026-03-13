@@ -41,7 +41,7 @@ const SEEDED_EMPLOYEES: Employee[] = Array.from({ length: 42 }, (_, index) => {
     photoUrl: `https://i.pravatar.cc/150?img=${photoId}`,
     trainings,
     status: 'active',
-    active: true,
+    active:  false,
   }
 })
 
@@ -54,13 +54,14 @@ function App() {
   }
 
   const handleAddEmployeesToPool = (ids: string[]) => {
-    const idsSet = new Set(ids)
-    setEmployees((prev) =>
-      prev.map((employee) =>
-        idsSet.has(employee.id) ? { ...employee, active: true } : employee
-      )
-    )
-  }
+  const idsSet = new Set(ids)
+  setEmployees((prev) =>
+    prev.map((employee) => ({
+      ...employee,
+      active: idsSet.has(employee.id),
+    }))
+  )
+}
 
   const pageContent = {
     'shift-planner': <ShiftPlannerPage />,

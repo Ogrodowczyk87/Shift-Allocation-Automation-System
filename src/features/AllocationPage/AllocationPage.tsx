@@ -24,6 +24,7 @@ const createSlotsForLocationPairs = (
       area,
       aisle: current,
       location: next,
+      active: false,
       assignetEmployeeId: null,
     })
   }
@@ -31,18 +32,29 @@ const createSlotsForLocationPairs = (
   return slots
 }
 
+
 const DEFAULT_SLOTS: Slot[] = [
-  ...createSlotsForLocationPairs('A', 1, 54),
+  ...createSlotsForLocationPairs('A', 29, 52),
+  ...createSlotsForLocationPairs('A', 1, 28),
+  ...createSlotsForLocationPairs('B', 1, 26),
   ...createSlotsForLocationPairs('B', 27, 52),
 ]
 
 export function AllocationPage({ employees }: AllocationPageProps) {
   const [slots, setSlots] = useState<Slot[]>(DEFAULT_SLOTS)
-
+  
   const activeEmployees = useMemo(
     () => employees.filter((employee) => employee.active && employee.status === 'active'),
     [employees]
   )
+  
+   const handleToggleSlot = (slotId: string) => {
+    setSlots((currentSlots) =>
+      currentSlots.map((slot) =>
+        slot.id === slotId ? { ...slot, active: !slot.active } : slot
+      )
+    )
+  }
 
   const employeesById = useMemo(
     () =>
@@ -52,40 +64,73 @@ export function AllocationPage({ employees }: AllocationPageProps) {
     [employees]
   )
 
-  const unassignedEmployees = useMemo(() => {
+const unassignedEmployees = useMemo(() => {
     const assignedIds = new Set(
       slots
         .map((slot) => slot.assignetEmployeeId)
         .filter((employeeId): employeeId is string => Boolean(employeeId))
     )
     return activeEmployees.filter((employee) => !assignedIds.has(employee.id))
+
   }, [activeEmployees, slots])
 
-  const handleAllocate = () => {
-    setSlots((currentSlots) =>
-      currentSlots.map((slot, index) => ({
-        ...slot,
-        assignetEmployeeId: activeEmployees[index]?.id ?? null,
-      }))
+  // const handleAllocate = () => {
+  //   setSlots((currentSlots) =>
+  //     currentSlots.map((slot, index) => ({
+  //       ...slot,
+  //       assignetEmployeeId: activeEmployees[index]?.id ?? null,
+  //     }))
+  //   )
+  // }
+
+const handleAllocate = () => {
+  setSlots((currentSlots) => {
+    const assignedIds = new Set(
+      currentSlots
+        .map((slot) => slot.assignetEmployeeId)
+        .filter((employeeId): employeeId is string => Boolean(employeeId))
     )
-  }
+
+    const remainingEmployees = activeEmployees.filter(
+      (employee) => !assignedIds.has(employee.id)
+    )
+
+    let employeeIndex = 0
+
+    return currentSlots.map((slot) => {
+      if (!slot.active) {
+        return slot
+      }
+
+      if (slot.assignetEmployeeId) {
+        return slot
+      }
+
+      const employee = remainingEmployees[employeeIndex]
+      employeeIndex += 1
+
+      return {
+        ...slot,
+        assignetEmployeeId: employee?.id ?? null,
+      }
+    })
+  })
+}
+
+
+
+//   const activeSlots = useMemo(
+//   () => slots.filter((slot) => slot.active),
+//   [slots]
+// )
+
 
   return (
     <div className="p-6 space-y-6">
-      <AllocationToolbar poolCount={activeEmployees.length} onAllocate={handleAllocate} />
-
-      <div className="grid grid-cols-3 gap-6">
-        <div className="space-y-6">
-          {/* <ActiveEmployeesPanel employees={activeEmployees} /> */}
-          {/* <UnassignedEmployeesPanel employees={unassignedEmployees} /> */}
-        </div>
-      </div>
-
-        <div className="col-span-2">
+          <AllocationToolbar poolCount={activeEmployees.length} slots={slots} onToggleSlot={handleToggleSlot} onAllocate={handleAllocate} />
+          <UnassignedEmployeesPanel employees={unassignedEmployees} />
           <AllocationBoard slots={slots} employeesById={employeesById} />
-        </div>
-
-      <LegendBar />
+          <LegendBar />
     </div>
   )
 }
