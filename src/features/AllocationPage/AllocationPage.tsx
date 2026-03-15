@@ -71,10 +71,16 @@ export function AllocationPage({ employees }: AllocationPageProps) {
     [employees]
   )
   
-   const handleToggleSlot = (slotId: string) => {
+  const handleToggleSlot = (slotId: string) => {
     setSlots((currentSlots) =>
       currentSlots.map((slot) =>
-        slot.id === slotId ? { ...slot, active: !slot.active } : slot
+        slot.id === slotId
+          ? {
+              ...slot,
+              active: !slot.active,
+              assignetEmployeeId: slot.active ? null : slot.assignetEmployeeId,
+            }
+          : slot
       )
     )
   }
@@ -120,47 +126,51 @@ export function AllocationPage({ employees }: AllocationPageProps) {
     )
 
     let employeeIndex = 0
+    const nextSpecialTasks = specialTasks.map((task) => {
+      if (!task.active || task.assignedEmployeeId) {
+        return task
+      }
 
-    setSpecialTasks((currentTasks) =>
-      currentTasks.map((task) => {
-        if (!task.active || task.assignedEmployeeId) {
-          return task
-        }
+      const employee = remainingEmployees[employeeIndex]
+      employeeIndex += 1
 
-        const employee = remainingEmployees[employeeIndex]
-        employeeIndex += 1
+      return {
+        ...task,
+        assignedEmployeeId: employee?.id ?? null,
+      }
+    })
 
-        return {
-          ...task,
-          assignedEmployeeId: employee?.id ?? null,
-        }
-      })
-    )
+    const nextSlots = slots.map((slot) => {
+      if (!slot.active || slot.assignetEmployeeId) {
+        return slot
+      }
 
-    setSlots((currentSlots) =>
-      currentSlots.map((slot) => {
-        if (!slot.active || slot.assignetEmployeeId) {
-          return slot
-        }
+      const employee = remainingEmployees[employeeIndex]
+      employeeIndex += 1
 
-        const employee = remainingEmployees[employeeIndex]
-        employeeIndex += 1
+      return {
+        ...slot,
+        assignetEmployeeId: employee?.id ?? null,
+      }
+    })
 
-        return {
-          ...slot,
-          assignetEmployeeId: employee?.id ?? null,
-        }
-      })
-    )
+    setSpecialTasks(nextSpecialTasks)
+    setSlots(nextSlots)
   }
 
-const handleToggleSpecialTask = (taskId: string) => {
-  setSpecialTasks((currentTasks) =>
-    currentTasks.map((task) =>
-      task.id === taskId ? { ...task, active: !task.active } : task
+  const handleToggleSpecialTask = (taskId: string) => {
+    setSpecialTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        task.id === taskId
+          ? {
+              ...task,
+              active: !task.active,
+              assignedEmployeeId: task.active ? null : task.assignedEmployeeId,
+            }
+          : task
+      )
     )
-  )
-}
+  }
 
 
 //   const activeSlots = useMemo(

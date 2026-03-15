@@ -16,16 +16,18 @@ const UNASSIGNED_AVATAR =
   )
 
 export function AllocationBoard({ slots, employeesById }: AllocationBoardProps) {
-  const aLeft = slots.filter(
+  const activeSlots = slots.filter((slot) => slot.active)
+
+  const aLeft = activeSlots.filter(
     (slot) => slot.area === 'A' && slot.aisle >= 29 && slot.aisle <= 52
   )
-  const aRight = slots.filter(
+  const aRight = activeSlots.filter(
     (slot) => slot.area === 'A' && slot.aisle >= 1 && slot.aisle <= 28
   )
-  const bLeft = slots.filter(
+  const bLeft = activeSlots.filter(
     (slot) => slot.area === 'B' && slot.aisle >= 1 && slot.aisle <= 26
   )
-  const bRight = slots.filter(
+  const bRight = activeSlots.filter(
     (slot) => slot.area === 'B' && slot.aisle >= 27 && slot.aisle <= 52
   )
 
@@ -70,27 +72,31 @@ export function AllocationBoard({ slots, employeesById }: AllocationBoardProps) 
     <section className="rounded-xl border border-sky-200 bg-white p-4">
       <h2 className="text-base font-semibold">Stations</h2>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-4">
-        <div>
-          <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka A: 29-52</h3>
-          <div className="space-y-3">{aLeft.map(renderSlot)}</div>
-        </div>
+      {activeSlots.length === 0 ? (
+        <p className="mt-4 text-sm text-slate-500">No stations selected for today.</p>
+      ) : (
+        <div className="mt-4 grid gap-4 lg:grid-cols-4">
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka A: 29-52</h3>
+            <div className="space-y-3">{aLeft.map(renderSlot)}</div>
+          </div>
 
-        <div>
-          <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka A: 1-28</h3>
-          <div className="space-y-3">{aRight.map(renderSlot)}</div>
-        </div>
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka A: 1-28</h3>
+            <div className="space-y-3">{aRight.map(renderSlot)}</div>
+          </div>
 
-        <div>
-          <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka B: 1-26</h3>
-          <div className="space-y-3">{bLeft.map(renderSlot)}</div>
-        </div>
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka B: 1-26</h3>
+            <div className="space-y-3">{bLeft.map(renderSlot)}</div>
+          </div>
 
-        <div>
-          <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka B: 27-52</h3>
-          <div className="space-y-3">{bRight.map(renderSlot)}</div>
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka B: 27-52</h3>
+            <div className="space-y-3">{bRight.map(renderSlot)}</div>
+          </div>
         </div>
-      </div>
+      )}
     </section>
   )
 }
