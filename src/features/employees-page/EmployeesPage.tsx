@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { AddEmployee } from './AddEmployee'
 import type { Employee, EmployeeStatus, Training } from '../../models/Employee'
-import { TRAININGS_OPTIONS } from "../../models/Employee"
+import { TRAININGS_OPTIONS } from '../../models/Employee'
 import { buildEmployeeAvatarUrl, resolveEmployeePhotoUrl } from '../../utils/employeeAvatar'
 
 type EmployeesPageProps = {
@@ -17,9 +17,12 @@ export function EmployeesPage({
 }: EmployeesPageProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
-  const [trainingFilter, setTrainingFilter] = useState<"All Trainings" | Training>("All Trainings")
-  const [statusFilter, setStatusFilter] = useState<"All Statuses" | EmployeeStatus>("All Statuses")
-  const [search, setSearch] = useState("")
+  const [trainingFilter, setTrainingFilter] = useState<'All Trainings' | Training>('All Trainings')
+  const [statusFilter, setStatusFilter] = useState<'All Statuses' | EmployeeStatus>('All Statuses')
+  const [search, setSearch] = useState('')
+
+  const poolCount = employees.filter((employee) => employee.active).length
+  const activeStatusCount = employees.filter((employee) => employee.status === 'active').length
 
   const handleAllocateSelected = () => {
     if (selectedIds.length === 0) return
@@ -30,9 +33,9 @@ export function EmployeesPage({
   const filteredEmployees = useMemo(() => {
     return employees.filter((e) => {
       const byTraining =
-        trainingFilter === "All Trainings" || e.trainings.includes(trainingFilter)
+        trainingFilter === 'All Trainings' || e.trainings.includes(trainingFilter)
       const byStatus =
-        statusFilter === "All Statuses" || e.status === statusFilter
+        statusFilter === 'All Statuses' || e.status === statusFilter
       const q = search.trim().toLowerCase()
       const bySearch =
         q.length === 0 ||
@@ -65,102 +68,179 @@ export function EmployeesPage({
 
   return (
     <div className="flex items-start gap-4">
-      <section className="flex-1 rounded-lg border border-sky-200 bg-white p-6 text-slate-900">
-        <h1 className="text-xl font-semibold">Employees</h1>
+      <section className="flex-1 overflow-hidden rounded-2xl border border-sky-200 bg-white text-slate-900 shadow-sm">
+        <div className="border-b border-sky-100 bg-gradient-to-r from-sky-50 via-white to-sky-50 px-6 py-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Employees</p>
+              <h1 className="mt-1 text-xl font-semibold text-slate-900">Team pool and selection</h1>
+            </div>
 
-        <div className="mt-4 rounded-md border bg-slate-50 p-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <select value={trainingFilter} onChange={(e) => setTrainingFilter(e.target.value as any)} className="rounded-md border px-3 py-2">
-              <option>All Trainings</option>
-              {TRAININGS_OPTIONS.map((t) => <option key={t}>{t}</option>)}
-            </select>
-
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="rounded-md border px-3 py-2">
-              <option>All Statuses</option>
-              <option value="active">active</option>
-              <option value="inactive">inactive</option>
-            </select>
-
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search..."
-              className="min-w-[220px] rounded-md border px-3 py-2"
-            />
-          </div>
-        </div>
-
-        <div className="mt-3 rounded-md border bg-sky-50 p-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm">
-              Selected: {selectedIds.length}
-            </span>
-            <div className="flex gap-2">
-              <button onClick={toggleSelectAllVisible} className="rounded-md border bg-white px-3 py-1 text-sm">
-                {allVisibleSelected ? "Deselect visible" : "Select visible"}
-              </button>
-              <button onClick={() => setSelectedIds([])} className="rounded-md border bg-white px-3 py-1 text-sm">
-                Clear selection
-              </button>
-              <button
-                onClick={handleAllocateSelected}
-                disabled={selectedIds.length === 0}
-                className="rounded-md border bg-sky-600 px-3 py-1 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                Add selected to pool
-              </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="rounded-full border border-sky-200 bg-white px-3 py-1.5 text-sm text-slate-600">
+                Total: <span className="font-semibold text-slate-900">{employees.length}</span>
+              </div>
+              <div className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
+                Active status: <span className="font-semibold text-slate-900">{activeStatusCount}</span>
+              </div>
+              <div className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600">
+                In pool: <span className="font-semibold text-slate-900">{poolCount}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {filteredEmployees.length === 0 ? (
-          <p className="mt-4 text-sm text-slate-600">No employees match the selected filters.</p>
-        ) : (
-          <ul className="mt-4 space-y-2">
-            {filteredEmployees.map((employee) => (
-              <li key={employee.id} className="flex items-center gap-3 rounded-md border border-slate-200 px-3 py-2">
+        <div className="space-y-5 p-6">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+            <div className="mb-4">
+              <h2 className="text-sm font-semibold text-slate-900">Filters</h2>
+              <p className="mt-1 text-sm text-slate-500">Filter employees by training, status, or quick search.</p>
+            </div>
+
+            <div className="grid gap-3 lg:grid-cols-3">
+              <label className="space-y-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Training</span>
+                <select
+                  value={trainingFilter}
+                  onChange={(e) => setTrainingFilter(e.target.value as 'All Trainings' | Training)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-sky-300"
+                >
+                  <option>All Trainings</option>
+                  {TRAININGS_OPTIONS.map((t) => <option key={t}>{t}</option>)}
+                </select>
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Status</span>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as 'All Statuses' | EmployeeStatus)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-sky-300"
+                >
+                  <option>All Statuses</option>
+                  <option value="active">active</option>
+                  <option value="inactive">inactive</option>
+                </select>
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Search</span>
                 <input
-                  type="checkbox"
-                  checked={selectedIds.includes(employee.id)}
-                  onChange={() => toggleSelect(employee.id)}
-                  className="h-4 w-4"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by name or ID..."
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-sky-300"
                 />
+              </label>
+            </div>
+          </div>
 
-                <img
-                  src={resolveEmployeePhotoUrl(employee)}
-                  alt={`${employee.firstName} ${employee.lastName}`}
-                  onError={(event) => {
-                    event.currentTarget.onerror = null
-                    event.currentTarget.src = buildEmployeeAvatarUrl(employee)
-                  }}
-                  className="h-10 w-10 rounded-full object-cover"
-                />
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-semibold text-slate-900">Selection</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Selected: <span className="font-medium text-slate-900">{selectedIds.length}</span>
+                  {' '}of{' '}
+                  <span className="font-medium text-slate-900">{filteredEmployees.length}</span> visible employees
+                </p>
+              </div>
 
-                <div className="min-w-[180px]">
-                  <span className="font-medium">{employee.firstName} {employee.lastName}</span>
-                  <span className="ml-2 text-sm text-slate-500">#{employee.id}</span>
-                </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={toggleSelectAllVisible}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-sky-200 hover:bg-sky-50"
+                >
+                  {allVisibleSelected ? 'Deselect visible' : 'Select visible'}
+                </button>
+                <button
+                  onClick={() => setSelectedIds([])}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-sky-200 hover:bg-sky-50"
+                >
+                  Clear selection
+                </button>
+                <button
+                  onClick={handleAllocateSelected}
+                  disabled={selectedIds.length === 0}
+                  className="rounded-xl bg-sky-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Add selected to pool
+                </button>
+              </div>
+            </div>
+          </div>
 
-                <div className="flex flex-wrap gap-1">
-                  {employee.trainings.length === 0 ? (
-                    <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">No trainings</span>
-                  ) : (
-                    employee.trainings.map((t) => (
-                      <span key={t} className="rounded bg-sky-100 px-2 py-0.5 text-xs text-sky-700">{t}</span>
-                    ))
-                  )}
-                </div>
+          {filteredEmployees.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center text-sm text-slate-500">
+              No employees match the selected filters.
+            </div>
+          ) : (
+            <ul className="space-y-3">
+              {filteredEmployees.map((employee) => {
+                const isSelected = selectedIds.includes(employee.id)
 
-                <span className="ml-auto rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
-                  {employee.status}
-                </span>
-                {employee.active ? (
-                  <span className="rounded bg-sky-100 px-2 py-0.5 text-xs text-sky-700">In pool</span>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        )}
+                return (
+                  <li
+                    key={employee.id}
+                    className={`rounded-2xl border px-4 py-3 transition ${
+                      isSelected
+                        ? 'border-sky-200 bg-sky-50/80 shadow-sm'
+                        : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/40'
+                    }`}
+                  >
+                    <label className="flex cursor-pointer flex-wrap items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(employee.id)}
+                        className="h-4 w-4 rounded border-slate-300 accent-sky-600"
+                      />
+
+                      <img
+                        src={resolveEmployeePhotoUrl(employee)}
+                        alt={`${employee.firstName} ${employee.lastName}`}
+                        onError={(event) => {
+                          event.currentTarget.onerror = null
+                          event.currentTarget.src = buildEmployeeAvatarUrl(employee)
+                        }}
+                        className="h-11 w-11 rounded-full object-cover ring-2 ring-white"
+                      />
+
+                      <div className="min-w-[180px]">
+                        <p className="font-medium text-slate-900">{employee.firstName} {employee.lastName}</p>
+                        <p className="text-sm text-slate-500">#{employee.id}</p>
+                      </div>
+
+                      <div className="flex flex-1 flex-wrap gap-1.5">
+                        {employee.trainings.length === 0 ? (
+                          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600">No trainings</span>
+                        ) : (
+                          employee.trainings.map((t) => (
+                            <span key={t} className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-medium text-sky-700">{t}</span>
+                          ))
+                        )}
+                      </div>
+
+                      <div className="ml-auto flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                          {employee.status}
+                        </span>
+                        {employee.active ? (
+                          <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-medium text-sky-700">In pool</span>
+                        ) : null}
+                        {isSelected ? (
+                          <span className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-200">
+                            Selected
+                          </span>
+                        ) : null}
+                      </div>
+                    </label>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
       </section>
 
       <AddEmployee onAddEmployee={onAddEmployee} />

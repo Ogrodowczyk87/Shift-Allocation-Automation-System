@@ -65,12 +65,12 @@ const DEFAULT_SPECIAL_TASKS: SpecialTask[] = [
 export function AllocationPage({ employees }: AllocationPageProps) {
   const [slots, setSlots] = useState<Slot[]>(DEFAULT_SLOTS)
   const [specialTasks, setSpecialTasks] = useState<SpecialTask[]>(DEFAULT_SPECIAL_TASKS)
-  
+
   const activeEmployees = useMemo(
     () => employees.filter((employee) => employee.active && employee.status === 'active'),
     [employees]
   )
-  
+
   const handleToggleSlot = (slotId: string) => {
     setSlots((currentSlots) =>
       currentSlots.map((slot) =>
@@ -172,6 +172,38 @@ export function AllocationPage({ employees }: AllocationPageProps) {
     )
   }
 
+  const handleSetSlotsActive = (slotIds: string[], active: boolean) => {
+    const slotIdsSet = new Set(slotIds)
+
+    setSlots((currentSlots) =>
+      currentSlots.map((slot) =>
+        slotIdsSet.has(slot.id)
+          ? {
+              ...slot,
+              active,
+              assignetEmployeeId: active ? slot.assignetEmployeeId : null,
+            }
+          : slot
+      )
+    )
+  }
+
+  const handleSetSpecialTasksActive = (taskIds: string[], active: boolean) => {
+    const taskIdsSet = new Set(taskIds)
+
+    setSpecialTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        taskIdsSet.has(task.id)
+          ? {
+              ...task,
+              active,
+              assignedEmployeeId: active ? task.assignedEmployeeId : null,
+            }
+          : task
+      )
+    )
+  }
+
 
 //   const activeSlots = useMemo(
 //   () => slots.filter((slot) => slot.active),
@@ -182,11 +214,13 @@ export function AllocationPage({ employees }: AllocationPageProps) {
   return (
     <div className="p-6 space-y-6">
   <AllocationToolbar
-    poolCount={activeEmployees.length}
+    poolCount={unassignedEmployees.length}
     slots={slots}
     specialTasks={specialTasks}
     onToggleSlot={handleToggleSlot}
     onToggleSpecialTask={handleToggleSpecialTask}
+    onSetSlotsActive={handleSetSlotsActive}
+    onSetSpecialTasksActive={handleSetSpecialTasksActive}
     onAllocate={handleAllocate}
   />         
  <UnassignedEmployeesPanel employees={unassignedEmployees} />

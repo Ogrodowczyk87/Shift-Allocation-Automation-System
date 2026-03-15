@@ -77,22 +77,22 @@ export function AllocationBoard({ slots, employeesById }: AllocationBoardProps) 
       ) : (
         <div className="mt-4 grid gap-4 lg:grid-cols-4">
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka A: 29-52</h3>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Aisle A: 29-52</h3>
             <div className="space-y-3">{aLeft.map(renderSlot)}</div>
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka A: 1-28</h3>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Aisle A: 1-28</h3>
             <div className="space-y-3">{aRight.map(renderSlot)}</div>
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka B: 1-26</h3>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Aisle B: 1-26</h3>
             <div className="space-y-3">{bLeft.map(renderSlot)}</div>
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-slate-700">Alejka B: 27-52</h3>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Aisle B: 27-52</h3>
             <div className="space-y-3">{bRight.map(renderSlot)}</div>
           </div>
         </div>
