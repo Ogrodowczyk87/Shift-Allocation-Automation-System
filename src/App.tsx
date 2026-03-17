@@ -24,11 +24,11 @@ const SEEDED_LAST_NAMES = [
   'Wlodarczyk', 'Zurawski',
 ] as const
 
-const SEEDED_EMPLOYEES: Employee[] = Array.from({ length: 42 }, (_, index) => {
+const SEEDED_EMPLOYEES: Employee[] = Array.from({ length: 70 }, (_, index) => {
   const number = index + 1
   const id = `E${String(number).padStart(3, '0')}`
-  const firstName = SEEDED_FIRST_NAMES[index]
-  const lastName = SEEDED_LAST_NAMES[index]
+  const firstName = SEEDED_FIRST_NAMES[index % SEEDED_FIRST_NAMES.length]
+  const lastName = SEEDED_LAST_NAMES[index % SEEDED_LAST_NAMES.length]
   const photoId = ((number - 1) % 70) + 1
   const trainings: Training[] =
     number % 3 === 0

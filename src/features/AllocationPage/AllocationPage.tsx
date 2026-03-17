@@ -6,6 +6,7 @@ import { SpecialTasksBoard } from './components/SpecialTasksBoard'
 import { AllocationToolbar } from './components/AllocationToolbar'
 import { LegendBar } from './components/LegendBar'
 import { UnassignedEmployeesPanel } from './components/UnassignedEmployeesPanel'
+import { InductTaskToolbar } from './components/InductTaskToolbar'
 
 type AllocationPageProps = {
   employees: Employee[]
@@ -53,6 +54,20 @@ const DEFAULT_SPECIAL_TASKS: SpecialTask[] = [
   { id: 'ws-induct1', name: 'water spider induct1', group: 'WaterSpider', active: false, assignedEmployeeId: null },
   { id: 'ws-asl', name: 'water spider ASL', group: 'WaterSpider', active: false, assignedEmployeeId: null },
   { id: 'ws-induct45', name: 'water spider induct 4-5', group: 'WaterSpider', active: false, assignedEmployeeId: null },
+  { id: 'ws-induct46', name: 'water spider induct 6-7', group: 'WaterSpider', active: false, assignedEmployeeId: null },
+
+  { id: 'induct1-loader', name: 'loader', group: 'Induct 1', active: false, assignedEmployeeId: null },
+  { id: 'induct1-label', name: 'label', group: 'Induct 1', active: false, assignedEmployeeId: null },
+  { id: 'induct1-pusher', name: 'pusher', group: 'Induct 1', active: false, assignedEmployeeId: null },
+
+  { id: 'induct45-loader', name: 'loader', group: 'Induct 4-5', active: false, assignedEmployeeId: null },
+  { id: 'induct45-label', name: 'label', group: 'Induct 4-5', active: false, assignedEmployeeId: null },
+  { id: 'induct45-pusher', name: 'pusher', group: 'Induct 4-5', active: false, assignedEmployeeId: null },
+
+  { id: 'induct67-loader', name: 'loader', group: 'Induct 6-7', active: false, assignedEmployeeId: null },
+  { id: 'induct67-label', name: 'label', group: 'Induct 6-7', active: false, assignedEmployeeId: null },
+  { id: 'induct67-pusher', name: 'pusher', group: 'Induct 6-7', active: false, assignedEmployeeId: null },
+
 
   { id: 'problem-solve', name: 'Problem Solving', group: 'Problem Solving', active: false, assignedEmployeeId: null },
   { id: 'divert-a', name: 'Divert A', group: 'Divert', active: false, assignedEmployeeId: null },
@@ -225,6 +240,11 @@ export function AllocationPage({ employees }: AllocationPageProps) {
   />         
  <UnassignedEmployeesPanel employees={unassignedEmployees} />
           <SpecialTasksBoard tasks={specialTasks} employeesById={employeesById} />
+          <InductTaskToolbar
+            task={specialTasks}
+            employeesById={employeesById}
+            onToggleTask={handleToggleSpecialTask}
+          />
           <AllocationBoard slots={slots} employeesById={employeesById} />
           <LegendBar />
     </div>
