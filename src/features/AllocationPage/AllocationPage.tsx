@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Employee, Slot, SpecialTask } from '../../models/Employee'
 // import { ActiveEmployeesPanel } from './components/ActiveEmployeesPanel'
 import { AllocationBoard } from './components/AllocationBoard'
 import { AllocationToolbar } from './components/AllocationToolbar'
 import { LegendBar } from './components/LegendBar'
 import { UnassignedEmployeesPanel } from './components/UnassignedEmployeesPanel'
+import { saveToLocalStorage, loadFromLocalStorage } from '../../services/storage/localStorage'
+import { STORAGE_KEYS } from '../../services/storage/keys'
 
 type AllocationPageProps = {
   employees: Employee[]
@@ -75,13 +77,25 @@ const DEFAULT_SPECIAL_TASKS: SpecialTask[] = [
 
 
 export function AllocationPage({ employees }: AllocationPageProps) {
-  const [slots, setSlots] = useState<Slot[]>(DEFAULT_SLOTS)
-  const [specialTasks, setSpecialTasks] = useState<SpecialTask[]>(DEFAULT_SPECIAL_TASKS)
+  const defaultState = {
+    slots: DEFAULT_SLOTS,
+    specialTasks: DEFAULT_SPECIAL_TASKS,
+  }
+
+  const savedState = loadFromLocalStorage(STORAGE_KEYS.allocationState, defaultState)
+
+  const [slots, setSlots] = useState<Slot[]>(savedState.slots)
+  const [specialTasks, setSpecialTasks] = useState<SpecialTask[]>(savedState.specialTasks)
 
   const activeEmployees = useMemo(
     () => employees.filter((employee) => employee.active && employee.status === 'active'),
     [employees]
   )
+
+useEffect(() => {
+  saveToLocalStorage(STORAGE_KEYS.allocationState, { slots, specialTasks })
+}, [slots, specialTasks])
+
 
   const handleToggleSlot = (slotId: string) => {
     setSlots((currentSlots) =>
