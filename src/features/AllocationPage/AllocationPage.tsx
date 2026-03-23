@@ -2,11 +2,9 @@ import { useMemo, useState } from 'react'
 import type { Employee, Slot, SpecialTask } from '../../models/Employee'
 // import { ActiveEmployeesPanel } from './components/ActiveEmployeesPanel'
 import { AllocationBoard } from './components/AllocationBoard'
-import { SpecialTasksBoard } from './components/SpecialTasksBoard'
 import { AllocationToolbar } from './components/AllocationToolbar'
 import { LegendBar } from './components/LegendBar'
 import { UnassignedEmployeesPanel } from './components/UnassignedEmployeesPanel'
-import { InductTaskToolbar } from './components/InductTaskToolbar'
 
 type AllocationPageProps = {
   employees: Employee[]
@@ -56,6 +54,12 @@ const DEFAULT_SPECIAL_TASKS: SpecialTask[] = [
   { id: 'ws-induct45', name: 'water spider induct 4-5', group: 'WaterSpider', active: false, assignedEmployeeId: null },
   { id: 'ws-induct46', name: 'water spider induct 6-7', group: 'WaterSpider', active: false, assignedEmployeeId: null },
 
+  { id: 'problem-solve', name: 'Problem Solving', group: 'Problem Solving', active: false, assignedEmployeeId: null },
+  { id: 'divert-a', name: 'Divert A', group: 'Divert', active: false, assignedEmployeeId: null },
+  { id: 'divert-b', name: 'Divert B', group: 'Divert', active: false, assignedEmployeeId: null },
+  { id: 'oversizes', name: 'Oversizes', group: 'Support', active: false, assignedEmployeeId: null },
+  { id: 'trainer', name: 'Trainer', group: 'Support', active: false, assignedEmployeeId: null },
+
   { id: 'induct1-loader', name: 'loader', group: 'Induct 1', active: false, assignedEmployeeId: null },
   { id: 'induct1-label', name: 'label', group: 'Induct 1', active: false, assignedEmployeeId: null },
   { id: 'induct1-pusher', name: 'pusher', group: 'Induct 1', active: false, assignedEmployeeId: null },
@@ -67,13 +71,6 @@ const DEFAULT_SPECIAL_TASKS: SpecialTask[] = [
   { id: 'induct67-loader', name: 'loader', group: 'Induct 6-7', active: false, assignedEmployeeId: null },
   { id: 'induct67-label', name: 'label', group: 'Induct 6-7', active: false, assignedEmployeeId: null },
   { id: 'induct67-pusher', name: 'pusher', group: 'Induct 6-7', active: false, assignedEmployeeId: null },
-
-
-  { id: 'problem-solve', name: 'Problem Solving', group: 'Problem Solving', active: false, assignedEmployeeId: null },
-  { id: 'divert-a', name: 'Divert A', group: 'Divert', active: false, assignedEmployeeId: null },
-  { id: 'divert-b', name: 'Divert B', group: 'Divert', active: false, assignedEmployeeId: null },
-  { id: 'oversizes', name: 'Oversizes', group: 'Support', active: false, assignedEmployeeId: null },
-  { id: 'trainer', name: 'Trainer', group: 'Support', active: false, assignedEmployeeId: null },
 ]
 
 
@@ -219,6 +216,40 @@ export function AllocationPage({ employees }: AllocationPageProps) {
     )
   }
 
+  const handleExportCsv = () => {
+    const header = 'Type,Location/Task,Assigned Employee'
+    const rows: string[] = []
+
+    // Add slots
+    slots.forEach((slot) => {
+      if (slot.assignetEmployeeId) {
+        const employee = employeesById.get(slot.assignetEmployeeId)
+        const employeeName = employee ? `${employee.firstName} ${employee.lastName}` : 'Unknown'
+        rows.push(`Slot,${slot.area} ${slot.aisle}-${slot.location},${employeeName}`)
+      }
+    })
+
+    // Add special tasks
+    specialTasks.forEach((task) => {
+      if (task.assignedEmployeeId) {
+        const employee = employeesById.get(task.assignedEmployeeId)
+        const employeeName = employee ? `${employee.firstName} ${employee.lastName}` : 'Unknown'
+        rows.push(`Special Task,${task.group} - ${task.name},${employeeName}`)
+      }
+    })
+
+    const csv = [header, ...rows].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download = 'allocation-export.csv'
+    link.click()
+
+    URL.revokeObjectURL(url)
+  }
+
 
 //   const activeSlots = useMemo(
 //   () => slots.filter((slot) => slot.active),
@@ -237,15 +268,10 @@ export function AllocationPage({ employees }: AllocationPageProps) {
     onSetSlotsActive={handleSetSlotsActive}
     onSetSpecialTasksActive={handleSetSpecialTasksActive}
     onAllocate={handleAllocate}
+    onExportCsv={handleExportCsv}
   />         
  <UnassignedEmployeesPanel employees={unassignedEmployees} />
-          <SpecialTasksBoard tasks={specialTasks} employeesById={employeesById} />
-          <InductTaskToolbar
-            task={specialTasks}
-            employeesById={employeesById}
-            onToggleTask={handleToggleSpecialTask}
-          />
-          <AllocationBoard slots={slots} employeesById={employeesById} />
+          <AllocationBoard slots={slots} specialTasks={specialTasks} employeesById={employeesById} />
           <LegendBar />
     </div>
   )

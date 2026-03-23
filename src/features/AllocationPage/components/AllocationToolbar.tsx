@@ -1,10 +1,12 @@
 import type { Slot, SpecialTask } from '../../../models/Employee'
+import { ExportCsvButton } from '../../../components/ui/ExportCsvButton'
 
 type AllocationToolbarProps = {
   poolCount: number
   slots: Slot[]
   specialTasks: SpecialTask[]
   onAllocate: () => void
+  onExportCsv: () => void
   onToggleSlot: (slotId: string) => void
   onToggleSpecialTask: (taskId: string) => void
   onSetSlotsActive: (slotIds: string[], active: boolean) => void
@@ -16,6 +18,7 @@ export function AllocationToolbar({
   slots,
   specialTasks,
   onAllocate,
+  onExportCsv,
   onToggleSlot,
   onToggleSpecialTask,
   onSetSlotsActive,
@@ -76,8 +79,21 @@ export function AllocationToolbar({
     Support: specialTasks.filter((task) => task.group === 'Support'),
   }
 
+  const groupedInductTasks = {
+    'Induct 1': specialTasks.filter((task) => task.group === 'Induct 1'),
+    'Induct 4-5': specialTasks.filter((task) => task.group === 'Induct 4-5'),
+    'Induct 6-7': specialTasks.filter((task) => task.group === 'Induct 6-7'),
+  }
+
+  // Separate Induct tasks for "Select all" functionality
+  const nonInductSpecialTasks = specialTasks.filter((task) => !task.group.startsWith('Induct '))
+  const inductSpecialTasks = specialTasks.filter((task) => task.group.startsWith('Induct '))
+  
   const allSpecialTasksChecked =
-    specialTasks.length > 0 && specialTasks.every((task) => task.active)
+    nonInductSpecialTasks.length > 0 && nonInductSpecialTasks.every((task) => task.active)
+  
+  const allInductTasksChecked =
+    inductSpecialTasks.length > 0 && inductSpecialTasks.every((task) => task.active)
 
   const activeSlotsCount = slots.filter((slot) => slot.active).length
   const activeSpecialTasksCount = specialTasks.filter((task) => task.active).length
@@ -119,7 +135,7 @@ export function AllocationToolbar({
 
   return (
     <section className="overflow-hidden rounded-2xl border border-sky-200 bg-white shadow-sm">
-      <div className="border-b border-sky-100 bg-gradient-to-r from-sky-50 via-white to-sky-50 px-5 py-4">
+      <div className="border-b border-sky-100 bg-gradient from-sky-50 via-white to-sky-50 px-5 py-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Allocation</p>
@@ -138,14 +154,17 @@ export function AllocationToolbar({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onAllocate}
-            disabled={poolCount === 0}
-            className="rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Allocate
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onAllocate}
+              disabled={poolCount === 0}
+              className="rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Allocate
+            </button>
+            <ExportCsvButton onClick={onExportCsv} />
+          </div>
         </div>
       </div>
 
@@ -172,20 +191,36 @@ export function AllocationToolbar({
               <h2 className="text-sm font-semibold text-slate-900">Special roles for today</h2>
               <p className="mt-1 text-sm text-slate-500">Use one switch to activate all support roles, or choose them individually.</p>
             </div>
-            <label className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white px-3 py-1.5 text-sm font-medium text-sky-800 shadow-sm">
-              <input
-                type="checkbox"
-                checked={allSpecialTasksChecked}
-                onChange={(event) =>
-                  onSetSpecialTasksActive(
-                    specialTasks.map((task) => task.id),
-                    event.target.checked
-                  )
-                }
-                className="h-4 w-4 rounded border-slate-300 accent-sky-600"
-              />
-              <span>Select all</span>
-            </label>
+            <div className="flex gap-3">
+              <label className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white px-3 py-1.5 text-sm font-medium text-sky-800 shadow-sm">
+                <input
+                  type="checkbox"
+                  checked={allSpecialTasksChecked}
+                  onChange={(event) =>
+                    onSetSpecialTasksActive(
+                      nonInductSpecialTasks.map((task) => task.id),
+                      event.target.checked
+                    )
+                  }
+                  className="h-4 w-4 rounded border-slate-300 accent-sky-600"
+                />
+                <span>Select all</span>
+              </label>
+              <label className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white px-3 py-1.5 text-sm font-medium text-sky-800 shadow-sm">
+                <input
+                  type="checkbox"
+                  checked={allInductTasksChecked}
+                  onChange={(event) =>
+                    onSetSpecialTasksActive(
+                      inductSpecialTasks.map((task) => task.id),
+                      event.target.checked
+                    )
+                  }
+                  className="h-4 w-4 rounded border-slate-300 accent-sky-600"
+                />
+                <span>Select all Induct</span>
+              </label>
+            </div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-4">
@@ -215,6 +250,45 @@ export function AllocationToolbar({
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Induct Tasks Section */}
+          <div className="mt-6 border-t border-slate-200 pt-4">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">Induct Tasks</h3>
+                <p className="mt-1 text-sm text-slate-500">Select induct tasks individually or use select all.</p>
+              </div>
+            </div>
+            
+            <div className="grid gap-4 lg:grid-cols-3">
+              {Object.entries(groupedInductTasks).map(([groupName, tasks]) => (
+                <div key={groupName} className="rounded-xl border border-white bg-white p-3 shadow-sm">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      {groupName}
+                    </h4>
+                    <span className="rounded-full bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700">
+                      {tasks.filter((task) => task.active).length}/{tasks.length}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {tasks.map((task) => (
+                      <label key={task.id} className="flex items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 transition hover:border-sky-200 hover:bg-sky-50/60">
+                        <input
+                          type="checkbox"
+                          checked={task.active}
+                          onChange={() => onToggleSpecialTask(task.id)}
+                          className="h-4 w-4 rounded border-slate-300 accent-sky-600"
+                        />
+                        <span>{task.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
