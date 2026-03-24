@@ -8,7 +8,6 @@ const NAV_ITEMS: Array<{ id: Page; label: string }> = [
   { id: 'shift-planner', label: 'Shift Planner' },
   { id: 'people', label: 'Employees' },
   { id: 'history', label: 'AllocationPage' },
-  { id: 'reports', label: 'Reports' },
 ]
 
 export function Navbar({ activePage, onSelectPage }: NavbarProps) {

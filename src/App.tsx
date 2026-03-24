@@ -4,7 +4,6 @@ import type { Page } from './app/layout/page.types'
 import { AllocationPage } from './features/AllocationPage/AllocationPage'
 import { EmployeesPage } from './features/employees-page/EmployeesPage'
 import type { Employee, Training } from './models/Employee'
-import { ReportsPage } from './features/reports-page/ReportsPage'
 import { ShiftPlannerPage } from './features/shift-planner/ShiftPlannerPage'
 import { SettingsPage } from './features/setting-page/settings'
 
@@ -64,7 +63,7 @@ function App() {
 }
 
   const pageContent = {
-    'shift-planner': <ShiftPlannerPage />,
+    'shift-planner': <ShiftPlannerPage employees={employees} />,
     people: (
       <EmployeesPage
         employees={employees}
@@ -73,7 +72,6 @@ function App() {
       />
     ),
     history: <AllocationPage employees={employees} />,
-    reports: <ReportsPage />,
     settings: <SettingsPage />,
   } as const
 
