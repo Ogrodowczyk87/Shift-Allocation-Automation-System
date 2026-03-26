@@ -1,11 +1,5 @@
-import type { Employee } from '../../../models/Employee'
-import type { Role } from '../../../models/Role'
 import { ScheduleRow } from './ScheduleRow'
-
-interface ScheduleItem {
-  role: Role
-  assignedEmployee?: Employee
-}
+import type { ScheduleItem } from './schedule.types'
 
 interface ScheduleTableProps {
   rows: ScheduleItem[]

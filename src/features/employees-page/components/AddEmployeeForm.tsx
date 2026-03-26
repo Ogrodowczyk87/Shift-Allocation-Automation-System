@@ -1,6 +1,6 @@
 import { useState } from "react"
-import type { FormEventHandler } from "react"
-import type { Employee, EmployeeStatus, Training } from "../../../models/Employee"
+import type { SubmitEventHandler } from "react"
+import type { Employee, Training } from "../../../models/Employee"
 import { TRAININGS_OPTIONS } from "../../../models/Employee"
 import { PhotoUpload } from "../../../components/ui/FileUploadInput"
 import { buildEmployeeAvatarUrl } from "../../../utils/employeeAvatar"
@@ -16,9 +16,8 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
   const [id, setId] = useState("")
   const [photoUrl, setPhotoUrl] = useState("")
   const [trainings, setTrainings] = useState<Training[]>([])
-  const [status, setStatus] = useState<EmployeeStatus>("active")
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault()
     const normalizedFirstName = firstName.trim()
     const normalizedLastName = lastName.trim()
@@ -35,7 +34,7 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
           lastName: normalizedLastName,
         }),
       trainings,
-      status,
+      status: "active",
       active: false,
     })
   }
@@ -45,9 +44,6 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
       prev.includes(training) ? prev.filter((t) => t !== training) : [...prev, training]
     )
   }
-
-
-
   return (
    <form onSubmit={handleSubmit} className="mt-4 space-y-4">
       <PhotoUpload onChange={setPhotoUrl} />
@@ -70,20 +66,6 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
           </label>
         ))}
       </div>
-
-      {/* <div className="grid gap-2">
-        <p className="text-sm font-medium">Status</p>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as EmployeeStatus)}
-          className="rounded-md border px-3 py-2"
-        >
-          {EMPLOYEE_STATUSES_OPTIONS.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
-      </div> */}
-
       <div className="pt-2">
         <button type="button" onClick={onCancel} className="rounded-md bg-slate-200 px-4 py-2">Cancel</button>
         <button type="submit" className="ml-2 rounded-md bg-sky-500 px-4 py-2 text-white">Add</button>

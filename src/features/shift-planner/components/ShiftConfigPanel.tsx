@@ -6,7 +6,9 @@ import { PresentEmployeesList } from './PresentEmployeesList'
 import { ShiftDateSelector } from './ShiftDateSelector'
 import { ShiftTypeSelector, type ShiftType } from './ShiftTypeSelector'
 
-const EMPLOYEES: Employee[] = [
+type ShiftPlannerEmployee = Pick<Employee, 'id' | 'firstName' | 'lastName'>
+
+const EMPLOYEES: ShiftPlannerEmployee[] = [
   { id: 'e1', firstName: 'Anna', lastName: 'Kowalska' },
   { id: 'e2', firstName: 'Jan', lastName: 'Nowak' },
   { id: 'e3', firstName: 'Maria', lastName: 'Wisniewska' },

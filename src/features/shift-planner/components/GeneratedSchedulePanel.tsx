@@ -1,14 +1,8 @@
 import { Card } from '../../../components/ui/Card'
-import type { Employee } from '../../../models/Employee'
-import type { Role } from '../../../models/Role'
 import { ExportCsvButton } from './buttons/ExportCsvButton'
+import type { ScheduleItem } from './schedule.types'
 import { SavePlanButton } from './buttons/SavePlanButton'
 import { ScheduleTable } from './ScheduleTable'
-
-interface ScheduleItem {
-  role: Role
-  assignedEmployee?: Employee
-}
 
 const SCHEDULE_ROWS: ScheduleItem[] = [
   {

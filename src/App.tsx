@@ -57,7 +57,7 @@ function App() {
   setEmployees((prev) =>
     prev.map((employee) => ({
       ...employee,
-      active: idsSet.has(employee.id),
+      active: employee.active || idsSet.has(employee.id),
     }))
   )
 }

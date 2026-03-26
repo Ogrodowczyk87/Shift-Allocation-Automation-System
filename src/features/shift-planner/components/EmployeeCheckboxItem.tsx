@@ -1,8 +1,10 @@
 import { Checkbox } from '../../../components/ui/Checkbox'
 import type { Employee } from '../../../models/Employee'
 
+type SelectableEmployee = Pick<Employee, 'id' | 'firstName' | 'lastName'>
+
 export interface EmployeeCheckboxItemProps {
-  employee: Employee
+  employee: SelectableEmployee
   checked: boolean
   onToggle: (id: string) => void
 }

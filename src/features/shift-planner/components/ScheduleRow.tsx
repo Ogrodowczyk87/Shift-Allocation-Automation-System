@@ -1,10 +1,9 @@
 import { TableRow } from '../../../components/ui/TableRow'
-import type { Employee } from '../../../models/Employee'
-import type { Role } from '../../../models/Role'
+import type { AssignedEmployee, ScheduleRole } from './schedule.types'
 
 export interface ScheduleRowProps {
-  role: Role
-  assignedEmployee?: Employee
+  role: ScheduleRole
+  assignedEmployee?: AssignedEmployee
 }
 
 export function ScheduleRow({ role, assignedEmployee }: ScheduleRowProps) {

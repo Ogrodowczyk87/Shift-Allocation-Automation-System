@@ -1,8 +1,10 @@
 import type { Employee } from '../../../models/Employee'
 import { EmployeeCheckboxItem } from './EmployeeCheckboxItem'
 
+type PresentEmployee = Pick<Employee, 'id' | 'firstName' | 'lastName'>
+
 interface PresentEmployeesListProps {
-  employees: Employee[]
+  employees: PresentEmployee[]
   selectedIds: string[]
   onToggle: (id: string) => void
 }
