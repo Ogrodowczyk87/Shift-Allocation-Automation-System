@@ -30,7 +30,8 @@ export function AddEmployeeForm({ onCancel, onSubmit, existingEmployeeIds }: Add
       return
     }
 
-    const duplicateId = existingEmployeeIds.some((employeeID) => employeeID.toLowerCase() === normalizedId.toLowerCase())
+    const duplicateId = existingEmployeeIds.some((existingId) => existingId === normalizedId)
+
     if (duplicateId) {
       setError("Employee ID already exists.")
       return
@@ -61,8 +62,7 @@ export function AddEmployeeForm({ onCancel, onSubmit, existingEmployeeIds }: Add
     )
   }
 
-
-return (
+  return (
    <form onSubmit={handleSubmit} className="mt-4 space-y-4">
       <PhotoUpload onChange={setPhotoUrl} />
 
@@ -108,4 +108,3 @@ return (
 }
 
 export default AddEmployeeForm
-
