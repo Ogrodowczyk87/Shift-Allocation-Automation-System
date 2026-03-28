@@ -23,6 +23,7 @@ export function EmployeesPage({
 
   const poolCount = employees.filter((employee) => employee.active).length
   const activeStatusCount = employees.filter((employee) => employee.status === 'active').length
+  const existingEmployeeIds = employees.map((employee) => employee.id)
 
   const handleAllocateSelected = () => {
     if (selectedIds.length === 0) return
@@ -243,7 +244,10 @@ export function EmployeesPage({
         </div>
       </section>
 
-      <AddEmployee onAddEmployee={onAddEmployee} />
+      <AddEmployee
+        onAddEmployee={onAddEmployee}
+        existingEmployeeIds={existingEmployeeIds}
+      />
     </div>
   )
 }

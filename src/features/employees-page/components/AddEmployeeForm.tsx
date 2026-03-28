@@ -8,24 +8,31 @@ import { buildEmployeeAvatarUrl } from "../../../utils/employeeAvatar"
 type AddEmployeeFormProps = {
   onCancel: () => void
   onSubmit: (employee: Employee) => void
+  existingEmployeeIds: string[]
 }
 
-export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
+export function AddEmployeeForm({ onCancel, onSubmit, existingEmployeeIds }: AddEmployeeFormProps) {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [id, setId] = useState("")
   const [photoUrl, setPhotoUrl] = useState("")
   const [trainings, setTrainings] = useState<Training[]>([])
   const [error, setError] = useState("")
-
+  
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault()
     const normalizedFirstName = firstName.trim()
     const normalizedLastName = lastName.trim()
     const normalizedId = id.trim()
-
+   
     if (!normalizedFirstName || !normalizedLastName || !normalizedId) {
       setError("All fields are required.")
+      return
+    }
+
+    const duplicateId = existingEmployeeIds.some((employeeID) => employeeID.toLowerCase() === normalizedId.toLowerCase())
+    if (duplicateId) {
+      setError("Employee ID already exists.")
       return
     }
 
@@ -47,19 +54,30 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
       active: false,
     })
   }
-
+  
   const toggleTraining = (training: Training) => {
     setTrainings((prev) =>
       prev.includes(training) ? prev.filter((t) => t !== training) : [...prev, training]
     )
   }
-  return (
+
+
+return (
    <form onSubmit={handleSubmit} className="mt-4 space-y-4">
       <PhotoUpload onChange={setPhotoUrl} />
 
-      <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="first name" className="w-full rounded-md border px-3 py-2" required />
-      <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="last name" className="w-full rounded-md border px-3 py-2" required />
-      <input value={id} onChange={(e) => setId(e.target.value)} placeholder="employee ID" className="w-full rounded-md border px-3 py-2" required />
+      <input value={firstName} onChange={(e) => {
+        setFirstName(e.target.value)
+        setError("")
+      }} placeholder="first name" className="w-full rounded-md border px-3 py-2" required />
+      <input value={lastName} onChange={(e) => {
+        setLastName(e.target.value)
+        setError("")
+      }} placeholder="last name" className="w-full rounded-md border px-3 py-2" required />
+      <input value={id} onChange={(e) => {
+        setId(e.target.value)
+        setError("")
+      }} placeholder="employee ID" className="w-full rounded-md border px-3 py-2" required />
 
 
     {error ? (
@@ -90,3 +108,4 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
 }
 
 export default AddEmployeeForm
+

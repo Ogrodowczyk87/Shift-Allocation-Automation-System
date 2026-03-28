@@ -5,9 +5,10 @@ import { AddEmployeeModal } from "./components/AddEmployeeModal"
 
 type Props = {
   onAddEmployee: (employee: Employee) => void
+  existingEmployeeIds: string[]
 }
 
-export const AddEmployee = ({ onAddEmployee }: Props) => {
+export const AddEmployee = ({ onAddEmployee, existingEmployeeIds }: Props) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -18,6 +19,7 @@ export const AddEmployee = ({ onAddEmployee }: Props) => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onAddEmployee={onAddEmployee}
+        existingEmployeeIds={existingEmployeeIds}
       />
     </>
   )
