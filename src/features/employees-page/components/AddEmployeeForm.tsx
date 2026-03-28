@@ -16,12 +16,21 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
   const [id, setId] = useState("")
   const [photoUrl, setPhotoUrl] = useState("")
   const [trainings, setTrainings] = useState<Training[]>([])
+  const [error, setError] = useState("")
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault()
     const normalizedFirstName = firstName.trim()
     const normalizedLastName = lastName.trim()
     const normalizedId = id.trim()
+
+    if (!normalizedFirstName || !normalizedLastName || !normalizedId) {
+      setError("All fields are required.")
+      return
+    }
+
+    setError("")
+
     onSubmit({
       id: normalizedId,
       firstName: normalizedFirstName,
@@ -51,6 +60,12 @@ export function AddEmployeeForm({ onCancel, onSubmit }: AddEmployeeFormProps) {
       <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="first name" className="w-full rounded-md border px-3 py-2" required />
       <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="last name" className="w-full rounded-md border px-3 py-2" required />
       <input value={id} onChange={(e) => setId(e.target.value)} placeholder="employee ID" className="w-full rounded-md border px-3 py-2" required />
+
+
+    {error ? (
+  <p className="text-sm text-rose-600">{error}</p>
+) : null}
+
 
       <div className="grid gap-2">
         <p className="text-sm font-medium">Trainings</p>
