@@ -5,9 +5,9 @@ interface NavbarProps {
 }
 
 const NAV_ITEMS: Array<{ id: Page; label: string }> = [
-  { id: 'shift-planner', label: 'Shift Planner' },
+  { id: 'shift-planner', label: 'Dashboard' },
   { id: 'people', label: 'Employees' },
-  { id: 'history', label: 'AllocationPage' },
+  { id: 'allocation', label: 'Allocation' },
 ]
 
 export function Navbar({ activePage, onSelectPage }: NavbarProps) {

@@ -1,9 +1,9 @@
 import type { Page } from './page.types'
 
 const SIDEBAR_ITEMS: Array<{ id: Page; label: string }> = [
-  { id: 'shift-planner', label: 'Shift Planner' },
+  { id: 'shift-planner', label: 'Dashboard' },
   { id: 'people', label: 'Employees' },
-  { id: 'history', label: 'AllocationPage' },
+  { id: 'allocation', label: 'Allocation' },
   { id: 'settings', label: 'Settings' },
 ]
 

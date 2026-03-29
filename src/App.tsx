@@ -4,7 +4,7 @@ import type { Page } from './app/layout/page.types'
 import { AllocationPage } from './features/AllocationPage/AllocationPage'
 import { EmployeesPage } from './features/employees-page/EmployeesPage'
 import type { Employee, Training } from './models/Employee'
-import { ShiftPlannerPage } from './features/shift-planner/ShiftPlannerPage'
+import { DashboardPage } from './features/shift-planner/DashboardPage'
 import { SettingsPage } from './features/setting-page/settings'
 
 const SEEDED_FIRST_NAMES = [
@@ -63,7 +63,7 @@ function App() {
 }
 
   const pageContent = {
-    'shift-planner': <ShiftPlannerPage employees={employees} />,
+    'shift-planner': <DashboardPage employees={employees} />,
     people: (
       <EmployeesPage
         employees={employees}
@@ -71,7 +71,7 @@ function App() {
         onAddEmployeesToPool={handleAddEmployeesToPool}
       />
     ),
-    history: <AllocationPage employees={employees} />,
+    allocation: <AllocationPage employees={employees} />,
     settings: <SettingsPage />,
   } as const
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { Employee, Slot, SpecialTask } from '../../../models/Employee'
 
 type ManualSlotAssignmentModalProps = {
@@ -23,19 +23,12 @@ export function ManualSlotAssignmentModal({
     [slots]
   )
 
-  const [draftAssignments, setDraftAssignments] = useState<Record<string, string | null>>({})
-
-  useEffect(() => {
-    if (!isOpen) {
-      return
-    }
-
-    setDraftAssignments(
+  const [draftAssignments, setDraftAssignments] = useState<Record<string, string | null>>(
+    () =>
       Object.fromEntries(
         activeSlots.map((slot) => [slot.id, slot.assignetEmployeeId ?? null])
-      )
-    )
-  }, [activeSlots, isOpen])
+      ) as Record<string, string | null>
+  )
 
   const specialTaskAssignedIds = useMemo(
     () =>

@@ -6,7 +6,7 @@ import { TRAININGS_OPTIONS } from '../../models/Employee'
 import { STORAGE_KEYS } from '../../services/storage/keys'
 import { loadFromLocalStorage } from '../../services/storage/localStorage'
 
-type ShiftPlannerPageProps = {
+type DashboardPageProps = {
   employees: Employee[]
 }
 
@@ -30,7 +30,7 @@ const formatToday = () =>
 
 const escapeCsvValue = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`
 
-export function ShiftPlannerPage({ employees }: ShiftPlannerPageProps) {
+export function DashboardPage({ employees }: DashboardPageProps) {
   const allocationSnapshot = loadFromLocalStorage<AllocationSnapshot>(
     STORAGE_KEYS.allocationState,
     EMPTY_ALLOCATION_SNAPSHOT,
@@ -86,7 +86,7 @@ export function ShiftPlannerPage({ employees }: ShiftPlannerPageProps) {
 
   const handleExportCsv = () => {
     const summaryRows = [
-      ['Planning day', planningDay],
+      ['Dashboard day', planningDay],
       ['Active employees', activeEmployees.length],
       ['Present in pool', presentEmployees.length],
       ['Inactive employees', employees.length - activeEmployees.length],
@@ -129,7 +129,7 @@ export function ShiftPlannerPage({ employees }: ShiftPlannerPageProps) {
     const link = document.createElement('a')
 
     link.href = url
-    link.download = `shift-planner-overview-${new Date().toISOString().slice(0, 10)}.csv`
+      link.download = `dashboard-overview-${new Date().toISOString().slice(0, 10)}.csv`
     link.click()
 
     URL.revokeObjectURL(url)
@@ -138,17 +138,17 @@ export function ShiftPlannerPage({ employees }: ShiftPlannerPageProps) {
   return (
     <section className="space-y-6">
       <header className="rounded-2xl border border-sky-200 bg-gradient-to-r from-white via-sky-50 to-cyan-50 p-6 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Shift Planner</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Dashboard</p>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-sky-950 sm:text-4xl">Live planning overview</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-sky-950 sm:text-4xl">Daily operations dashboard</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-600 sm:text-base">
-              This view is now based on real employee and allocation data. It shows who is available,
-              how much work is active, and where the current plan still has gaps.
+              This overview is based on current employee and allocation data. It gives you a quick
+              picture of availability, coverage, open work, and shift readiness.
             </p>
           </div>
           <div className="rounded-2xl border border-sky-200 bg-white/90 px-4 py-3 text-right shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Planning day</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Dashboard day</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{planningDay}</p>
             <div className="mt-3">
               <Button variant="secondary" onClick={handleExportCsv}>
