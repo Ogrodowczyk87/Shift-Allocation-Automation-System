@@ -1,5 +1,6 @@
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
+import appPreviewImage from '../../assets/app.png'
 import type { Employee, Slot, SpecialTask } from '../../models/Employee'
 import { TRAININGS_OPTIONS } from '../../models/Employee'
 import { STORAGE_KEYS } from '../../services/storage/keys'
@@ -294,32 +295,16 @@ export function ShiftPlannerPage({ employees }: ShiftPlannerPageProps) {
 
       <div>
         <Card>
-          <h2 className="text-lg font-semibold text-slate-900">How to use this app</h2>
-          <div className="mt-4 space-y-3">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Step 1</p>
-              <p className="mt-2 text-sm text-slate-700">
-                Go to <span className="font-semibold text-slate-900">Employees</span> and add the people who are present to the pool.
-              </p>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Step 2</p>
-              <p className="mt-2 text-sm text-slate-700">
-                Open <span className="font-semibold text-slate-900">AllocationPage</span> and activate the slots and special tasks needed for the shift.
-              </p>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Step 3</p>
-              <p className="mt-2 text-sm text-slate-700">
-                Come back to <span className="font-semibold text-slate-900">Shift Planner</span> to review coverage, open work, and training readiness.
-              </p>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Step 4</p>
-              <p className="mt-2 text-sm text-slate-700">
-                Finish assignments in <span className="font-semibold text-slate-900">AllocationPage</span> and export the final result when everything is covered.
-              </p>
-            </div>
+          <h2 className="text-lg font-semibold text-slate-900">Application preview</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            A quick visual preview of the current app interface.
+          </p>
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <img
+              src={appPreviewImage}
+              alt="Shift Allocation Automation System application preview"
+              className="w-full rounded-xl border border-slate-200 object-cover shadow-sm"
+            />
           </div>
         </Card>
       </div>
