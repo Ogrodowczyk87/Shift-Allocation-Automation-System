@@ -6,7 +6,9 @@ type AllocationToolbarProps = {
   slots: Slot[]
   specialTasks: SpecialTask[]
   onAllocate: () => void
+  onOpenManualAssign: () => void
   onExportCsv: () => void
+  onResetAll: () => void
   onToggleSlot: (slotId: string) => void
   onToggleSpecialTask: (taskId: string) => void
   onSetSlotsActive: (slotIds: string[], active: boolean) => void
@@ -18,7 +20,9 @@ export function AllocationToolbar({
   slots,
   specialTasks,
   onAllocate,
+  onOpenManualAssign,
   onExportCsv,
+  onResetAll,
   onToggleSlot,
   onToggleSpecialTask,
   onSetSlotsActive,
@@ -157,11 +161,26 @@ export function AllocationToolbar({
           <div className="flex gap-3">
             <button
               type="button"
+              onClick={onOpenManualAssign}
+              disabled={activeSlotsCount === 0}
+              className="rounded-xl border border-sky-200 bg-white px-4 py-2.5 text-sm font-medium text-sky-800 shadow-sm transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Assign manually
+            </button>
+            <button
+              type="button"
               onClick={onAllocate}
               disabled={poolCount === 0}
               className="rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Allocate
+            </button>
+            <button
+              type="button"
+              onClick={onResetAll}
+              className="rounded-xl border border-rose-200 bg-white px-4 py-2.5 text-sm font-medium text-rose-700 shadow-sm transition hover:bg-rose-50"
+            >
+              Reset all
             </button>
             <ExportCsvButton onClick={onExportCsv} />
           </div>

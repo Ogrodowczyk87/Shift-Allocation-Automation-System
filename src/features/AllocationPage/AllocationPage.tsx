@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Employee, Slot, SpecialTask } from '../../models/Employee'
 // import { ActiveEmployeesPanel } from './components/ActiveEmployeesPanel'
-import { AllocationBoard } from './components/AllocationBoard'
 import { AllocationToolbar } from './components/AllocationToolbar'
-import { LegendBar } from './components/LegendBar'
-import { UnassignedEmployeesPanel } from './components/UnassignedEmployeesPanel'
 import { saveToLocalStorage, loadFromLocalStorage } from '../../services/storage/localStorage'
 import { STORAGE_KEYS } from '../../services/storage/keys'
+import { AllocationSetupTab } from './components/AllocationSetupTab'
+import { AllocationBoardTab } from './components/AllocationBoardTab'
+import { ManualSlotAssignmentModal } from './components/ManualSlotAssignmentModal'
+
+type AllocationPageTab = 'setup' | 'board'
 
 type AllocationPageProps = {
   employees: Employee[]
@@ -86,6 +88,8 @@ export function AllocationPage({ employees }: AllocationPageProps) {
 
   const [slots, setSlots] = useState<Slot[]>(savedState.slots)
   const [specialTasks, setSpecialTasks] = useState<SpecialTask[]>(savedState.specialTasks)
+  const [activeTab, setActiveTab] = useState<AllocationPageTab>('board')
+  const [isManualAssignOpen, setIsManualAssignOpen] = useState(false)
 
   const activeEmployees = useMemo(
     () => employees.filter((employee) => employee.active && employee.status === 'active'),
@@ -230,6 +234,26 @@ useEffect(() => {
     )
   }
 
+  const handleSaveManualAssignments = (assignments: Record<string, string | null>) => {
+    setSlots((currentSlots) =>
+      currentSlots.map((slot) =>
+        Object.prototype.hasOwnProperty.call(assignments, slot.id)
+          ? {
+              ...slot,
+              assignetEmployeeId: assignments[slot.id] ?? null,
+            }
+          : slot
+      )
+    )
+  }
+
+  const handleResetAll = () => {
+    setSlots(DEFAULT_SLOTS)
+    setSpecialTasks(DEFAULT_SPECIAL_TASKS)
+    setIsManualAssignOpen(false)
+    setActiveTab('setup')
+  }
+
   const handleExportCsv = () => {
     const header = 'Type,Location/Task,Assigned Employee'
     const rows: string[] = []
@@ -263,8 +287,6 @@ useEffect(() => {
 
     URL.revokeObjectURL(url)
   }
-
-
 //   const activeSlots = useMemo(
 //   () => slots.filter((slot) => slot.active),
 //   [slots]
@@ -273,20 +295,60 @@ useEffect(() => {
 
   return (
     <div className="p-6 space-y-6">
-  <AllocationToolbar
-    poolCount={unassignedEmployees.length}
-    slots={slots}
-    specialTasks={specialTasks}
-    onToggleSlot={handleToggleSlot}
-    onToggleSpecialTask={handleToggleSpecialTask}
-    onSetSlotsActive={handleSetSlotsActive}
-    onSetSpecialTasksActive={handleSetSpecialTasksActive}
-    onAllocate={handleAllocate}
-    onExportCsv={handleExportCsv}
-  />         
- <UnassignedEmployeesPanel employees={unassignedEmployees} />
-          <AllocationBoard slots={slots} specialTasks={specialTasks} employeesById={employeesById} />
-          <LegendBar />
+      <AllocationToolbar
+        poolCount={unassignedEmployees.length}
+        slots={slots}
+        specialTasks={specialTasks}
+        onToggleSlot={handleToggleSlot}
+        onToggleSpecialTask={handleToggleSpecialTask}
+        onSetSlotsActive={handleSetSlotsActive}
+        onSetSpecialTasksActive={handleSetSpecialTasksActive}
+        onAllocate={handleAllocate}
+        onOpenManualAssign={() => setIsManualAssignOpen(true)}
+        onExportCsv={handleExportCsv}
+        onResetAll={handleResetAll}
+      />
+
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab('setup')}
+          className={`rounded-md px-4 py-2 ${
+            activeTab === 'setup' ? 'bg-sky-500 text-white' : 'bg-slate-200 text-slate-800'
+          }`}
+        >
+          Setup
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('board')}
+          className={`rounded-md px-4 py-2 ${
+            activeTab === 'board' ? 'bg-sky-500 text-white' : 'bg-slate-200 text-slate-800'
+          }`}
+        >
+          Board
+        </button>
+      </div>
+
+      {activeTab === 'setup' ? (
+        <AllocationSetupTab unassignedEmployees={unassignedEmployees} />
+      ) : (
+        <AllocationBoardTab
+          slots={slots}
+          specialTasks={specialTasks}
+          employeesById={employeesById}
+        />
+      )}
+
+      <ManualSlotAssignmentModal
+        key={isManualAssignOpen ? 'open' : 'closed'}
+        isOpen={isManualAssignOpen}
+        slots={slots}
+        specialTasks={specialTasks}
+        availableEmployees={activeEmployees}
+        onClose={() => setIsManualAssignOpen(false)}
+        onSave={handleSaveManualAssignments}
+      />
     </div>
   )
 }
