@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Card } from '../../../components/ui/Card'
 import type { Employee } from '../../../models/Employee'
-import { GenerateScheduleButton } from './buttons/GenerateScheduleButton'
 import { PresentEmployeesList } from './PresentEmployeesList'
 import { ShiftDateSelector } from './ShiftDateSelector'
 import { ShiftTypeSelector, type ShiftType } from './ShiftTypeSelector'
@@ -39,13 +38,7 @@ export function ShiftConfigPanel() {
     )
   }
 
-  const handleGenerate = () => {
-    console.log('Generate schedule', {
-      selectedDate,
-      shiftType,
-      presentEmployees: selectedEmployeeIds,
-    })
-  }
+  
 
   return (
     <Card>
@@ -68,9 +61,7 @@ export function ShiftConfigPanel() {
         />
       </div>
 
-      <div className="mt-4">
-        <GenerateScheduleButton onClick={handleGenerate} />
-      </div>
+      
     </Card>
   )
 }
