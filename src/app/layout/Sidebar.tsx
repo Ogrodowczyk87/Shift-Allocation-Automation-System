@@ -4,7 +4,6 @@ const SIDEBAR_ITEMS: Array<{ id: Page; label: string }> = [
   { id: 'shift-planner', label: 'Dashboard' },
   { id: 'people', label: 'Employees' },
   { id: 'allocation', label: 'Allocation' },
-  { id: 'settings', label: 'Settings' },
 ]
 
 interface SidebarProps {
