@@ -1,4 +1,4 @@
-import { Card } from '../../../components/ui/Card'
+ import { Card } from '../../../components/ui/Card'
 import { DonutChart } from './DonutChart'
 
 interface RotationComplianceCardProps {

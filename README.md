@@ -1,89 +1,186 @@
 # Shift Allocation Automation System
 
-A frontend application for shift planning and employee management.
+A work-in-progress operations app for employee pool management, daily allocation, and shift coverage overview.
 
 ## Project Goal
 
-The system is designed to improve day-to-day shift management by enabling:
-- fast assignment of employees to roles and tasks,
-- clear visibility into staffing and coverage,
-- one place for people management (`Employees`),
-- a foundation for history, reporting, and settings.
+The goal of this project is to replace spreadsheet-style shift coordination with one clearer workflow:
 
-## Problem It Solves
+- manage employees and their training records
+- add available people to the daily pool
+- activate slots and special tasks for the current shift
+- assign employees to active work areas
+- review coverage and export the result
 
-In many teams, shift planning is still handled manually (spreadsheets, chat messages, ad-hoc notes), which leads to:
-- assignment errors,
-- no single source of truth,
-- limited visibility of employee status and availability,
-- poor traceability of changes over time.
+## Current Product Scope
 
-This project consolidates those workflows into one operational interface.
+The application currently includes these main areas:
 
-## Current Scope
+- `Dashboard`: operational overview with live coverage, open work, and readiness summary
+- `Employees`: employee list, filters, and add-to-pool workflow
+- `Allocation`: slot activation, special task activation, automatic allocation, manual slot assignment, CSV export, and reset flow
+- `Settings`: placeholder page for future configuration
 
-- `Shift Planner`: configure shifts and review generated assignments.
-- `Employees (People)`: add employees and display list items (photo, first name, last name, ID).
-- `History`: placeholder for scheduling history and audit events.
-- `Reports`: placeholder for KPI summaries and exports.
-- `Settings`: basic settings page.
+Removed placeholders:
 
-## Technology Stack
+- `History`
+- `Reports`
+
+## Current Status
+
+This is an MVP frontend in active development, with a backend foundation now being added.
+
+What already works:
+
+- employee management in the frontend
+- daily pool selection
+- allocation setup and board split into separate tabs
+- manual employee assignment to active slots
+- allocation reset and CSV export
+- dashboard overview based on current allocation state
+
+What is still in progress:
+
+- persistent backend-driven data
+- authentication and authorization
+- production database integration
+- AWS deployment
+
+## Tech Stack
+
+Frontend:
 
 - React 19
-- TypeScript 5
+- TypeScript
 - Vite 7
 - Tailwind CSS 4
 - ESLint 9
 
+Backend foundation:
+
+- Node.js
+- Express
+- Apollo Server
+- GraphQL
+- PostgreSQL client (`pg`)
+
 ## Local Development
 
+### Frontend
+
 Requirements:
-- Node.js 20+ (LTS recommended)
+
+- Node.js 20+
 - npm
 
-Run locally:
+Run the frontend:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Useful scripts:
+Useful frontend scripts:
 
 ```bash
-npm run build   # production build
-npm run preview # preview production build
-npm run lint    # static analysis
+npm run build
+npm run preview
+npm run lint
 ```
 
-## Project Structure
+### Backend
+
+The backend scaffold lives in `src/server`.
+
+Run the backend:
+
+```bash
+cd src/server
+npm install
+npm run dev
+```
+
+Current backend endpoints:
+
+- `GET /health`
+- `POST /graphql`
+
+The backend expects an `.env` file in `src/server/` with:
+
+```env
+PORT=4000
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DB_NAME
+```
+
+Example health check:
+
+```bash
+curl http://localhost:4000/health
+```
+
+## GraphQL Foundation
+
+The initial backend setup includes:
+
+- a GraphQL schema for `Employee`
+- a `health` query
+- an `employees` query
+- an `addEmployee` mutation
+
+Current server structure:
+
+```text
+src/server/
+  src/
+    index.ts
+    db/
+      client.ts
+    schema/
+      typeDefs.ts
+      resolvers.ts
+```
+
+## Frontend Structure
 
 ```text
 src/
   app/
-    layout/                 # AppLayout, Sidebar, page types
+    layout/                 # app shell, sidebar, page types
   components/
-    ui/                     # shared UI components (Navbar, Button, Upload, etc.)
+    ui/                     # shared UI components
   features/
-    employees-page/         # employees view + Add Employee modal
-    shift-planner/          # core shift planning module
-    history-page/           # history placeholder
-    reports-page/           # reports placeholder
-    setting-page/           # settings
-  models/                   # domain models (e.g. Employee)
-  App.tsx                   # active-page mapping
-  main.tsx                  # application entry point
+    AllocationPage/         # daily slot and task allocation
+    employees-page/         # employee list and add employee flow
+    setting-page/           # future app settings
+    shift-planner/          # dashboard / overview module
+  models/                   # shared domain types
+  services/                 # local storage utilities
+  utils/                    # helper functions
+  App.tsx                   # top-level page mapping
 ```
 
-## Architecture Overview
+## Architecture Notes
 
-- The app follows a `feature`-based structure.
-- `App.tsx` switches views based on the active tab.
-- `AppLayout` provides the shared shell (navbar + sidebar + content area).
-- Local state is managed at feature-page level (e.g., employee list in `EmployeesPage`).
+- The frontend is feature-based.
+- The current frontend still uses local state and local storage for the main allocation workflow.
+- The backend is being introduced incrementally instead of replacing everything at once.
+- The long-term target is AWS deployment with managed persistence and Cognito-based authentication.
 
-## Project Status
+## Planned Next Steps
 
-Frontend MVP in active development.  
-Current focus areas: `Shift Planner` and `Employees`.
+- connect frontend employee data to the backend
+- move allocation state from local storage to the backend
+- add PostgreSQL persistence
+- add authentication with Amazon Cognito
+- deploy frontend and backend to AWS
+
+## Portfolio Context
+
+This project is intended to solve a real operational problem and to serve as a fullstack learning project.
+It is intentionally being developed in stages:
+
+1. working frontend MVP
+2. backend foundation
+3. database integration
+4. authentication
+5. AWS deployment
