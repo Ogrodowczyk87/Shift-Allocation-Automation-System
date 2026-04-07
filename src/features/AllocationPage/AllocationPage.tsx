@@ -2,14 +2,20 @@ import { useEffect, useMemo, useState } from 'react'
 import type { Employee, Slot, SpecialTask } from '../../models/Employee'
 // import { ActiveEmployeesPanel } from './components/ActiveEmployeesPanel'
 import { AllocationToolbar } from './components/AllocationToolbar'
-import { saveToLocalStorage, loadFromLocalStorage } from '../../services/storage/localStorage'
+import { loadFromLocalStorage } from '../../services/storage/localStorage'
 import { STORAGE_KEYS } from '../../services/storage/keys'
 import { AllocationSetupTab } from './components/AllocationSetupTab'
 import { AllocationBoardTab } from './components/AllocationBoardTab'
 import { ManualSlotAssignmentModal } from './components/ManualSlotAssignmentModal'
 import { planAssignments } from '../shift-planner/rotation/rotation-planner'
 import { applyManualAssignmentsToSlots } from '../shift-planner/rotation/manual-assignment'
-import type { AssignmentHistoryEntry, RotationTask } from '../shift-planner/rotation/rotation.types'
+import type { RotationTask } from '../shift-planner/rotation/rotation.types'
+import {
+  fetchAssignmentHistory,
+  saveAssignmentHistory,
+  type AssignmentHistoryEntry,
+} from '../../services/api/assignmentHistory'
+
 
 type AllocationPageTab = 'setup' | 'board'
 
@@ -93,6 +99,7 @@ export function AllocationPage({ employees }: AllocationPageProps) {
   const [specialTasks, setSpecialTasks] = useState<SpecialTask[]>(savedState.specialTasks)
   const [activeTab, setActiveTab] = useState<AllocationPageTab>('board')
   const [isManualAssignOpen, setIsManualAssignOpen] = useState(false)
+  const [assignmentHistory, setAssignmentHistory] = useState<AssignmentHistoryEntry[]>([])
 
   const activeEmployees = useMemo(
     () => employees.filter((employee) => employee.active && employee.status === 'active'),
@@ -100,40 +107,48 @@ export function AllocationPage({ employees }: AllocationPageProps) {
   )
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
-  const assignmentHistory = loadFromLocalStorage<AssignmentHistoryEntry[]>(
-    STORAGE_KEYS.assignmentHistory,
-    [],
-  )
 
-useEffect(() => {
-  saveToLocalStorage(STORAGE_KEYS.allocationState, { slots, specialTasks })
-}, [slots, specialTasks])
+  useEffect(() => {
+    fetchAssignmentHistory(today)
+      .then((entries) => {
+        setAssignmentHistory(entries)
+      })
+      .catch((error) => {
+        console.error('Failed to fetch assignment history', error)
+        setAssignmentHistory([])
+      })
+  }, [today])
 
   useEffect(() => {
     const todayEntries: AssignmentHistoryEntry[] = [
       ...slots
         .filter((slot) => slot.active && slot.assignetEmployeeId)
         .map((slot) => ({
-          date: today,
+          assignmentDate: today,
           employeeId: slot.assignetEmployeeId as string,
           taskId: slot.id,
+          assignmentType: 'slot',
+          source: 'AUTO_ASSIGNED',
         })),
       ...specialTasks
         .filter((task) => task.active && task.assignedEmployeeId)
         .map((task) => ({
-          date: today,
+          assignmentDate: today,
           employeeId: task.assignedEmployeeId as string,
           taskId: task.id,
+          assignmentType: 'special_task',
+          source: 'AUTO_ASSIGNED',
         })),
     ]
 
-    const previousEntries = assignmentHistory.filter((entry) => entry.date !== today)
+    if (todayEntries.length === 0) {
+      return
+    }
 
-    saveToLocalStorage(STORAGE_KEYS.assignmentHistory, [
-      ...previousEntries,
-      ...todayEntries,
-    ])
-  }, [assignmentHistory, slots, specialTasks, today])
+    void saveAssignmentHistory(todayEntries).catch((error) => {
+      console.error('Failed to save assignment history', error)
+    })
+  }, [slots, specialTasks, today])
 
 
   const handleToggleSlot = (slotId: string) => {
@@ -208,7 +223,11 @@ useEffect(() => {
       employees: activeEmployees,
       tasks: plannerTasks,
       date: today,
-      history: assignmentHistory,
+      history: assignmentHistory.map((entry) => ({
+        date: entry.assignmentDate,
+        employeeId: entry.employeeId,
+        taskId: entry.taskId,
+      })),
     })
 
     const assignmentMap = new Map(

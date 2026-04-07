@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import appPreviewImage from '../../assets/app.png'
@@ -6,7 +7,14 @@ import { TRAININGS_OPTIONS } from '../../models/Employee'
 import { STORAGE_KEYS } from '../../services/storage/keys'
 import { loadFromLocalStorage } from '../../services/storage/localStorage'
 import { planAssignments } from './rotation/rotation-planner'
-import type { AssignmentHistoryEntry, RotationTask } from './rotation/rotation.types'
+import type { RotationTask } from './rotation/rotation.types'
+import { fetchAssignmentHistory } from '../../services/api/assignmentHistory'
+
+type DashboardAssignmentHistoryEntry = {
+  date: string
+  employeeId: string
+  taskId: string
+}
 
 type DashboardPageProps = {
   employees: Employee[]
@@ -22,7 +30,7 @@ const EMPTY_ALLOCATION_SNAPSHOT: AllocationSnapshot = {
   specialTasks: [],
 }
 
-const EMPTY_ASSIGNMENT_HISTORY: AssignmentHistoryEntry[] = []
+const EMPTY_ASSIGNMENT_HISTORY: DashboardAssignmentHistoryEntry[] = []
 
 const formatToday = () =>
   new Intl.DateTimeFormat('en-GB', {
@@ -39,11 +47,9 @@ export function DashboardPage({ employees }: DashboardPageProps) {
     STORAGE_KEYS.allocationState,
     EMPTY_ALLOCATION_SNAPSHOT,
   )
-  const assignmentHistory = loadFromLocalStorage<AssignmentHistoryEntry[]>(
-    STORAGE_KEYS.assignmentHistory,
+  const [assignmentHistory, setAssignmentHistory] = useState<DashboardAssignmentHistoryEntry[]>(
     EMPTY_ASSIGNMENT_HISTORY,
   )
-
   const activeEmployees = employees.filter((employee) => employee.status === 'active')
   const presentEmployees = activeEmployees.filter((employee) => employee.active)
   const absentEmployees = activeEmployees.filter((employee) => !employee.active)
@@ -73,6 +79,26 @@ export function DashboardPage({ employees }: DashboardPageProps) {
       available,
     }
   })
+
+  useEffect(() => {
+    const selectedDate = new Date().toISOString().slice(0, 10)
+
+    fetchAssignmentHistory(selectedDate)
+      .then((data) => {
+        setAssignmentHistory(
+          data.map((entry) => ({
+            date: entry.assignmentDate,
+            employeeId: entry.employeeId,
+            taskId: entry.taskId,
+          }))
+        )
+      })
+      .catch((error) => {
+        console.error('Failed to fetch assignment history', error)
+        setAssignmentHistory([])
+      })
+  }, [])
+
 
   const employeesWithoutTraining = presentEmployees.filter((employee) => employee.trainings.length === 0)
 
