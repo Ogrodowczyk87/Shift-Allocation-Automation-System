@@ -7,4 +7,3 @@ CREATE TABLE IF NOT EXISTS assignment_history (
   source TEXT NOT NULL DEFAULT 'AUTO_ASSIGNED',
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
-›
