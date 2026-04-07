@@ -7,6 +7,9 @@ import { STORAGE_KEYS } from '../../services/storage/keys'
 import { AllocationSetupTab } from './components/AllocationSetupTab'
 import { AllocationBoardTab } from './components/AllocationBoardTab'
 import { ManualSlotAssignmentModal } from './components/ManualSlotAssignmentModal'
+import { planAssignments } from '../shift-planner/rotation/rotation-planner'
+import { applyManualAssignmentsToSlots } from '../shift-planner/rotation/manual-assignment'
+import type { AssignmentHistoryEntry, RotationTask } from '../shift-planner/rotation/rotation.types'
 
 type AllocationPageTab = 'setup' | 'board'
 
@@ -96,9 +99,41 @@ export function AllocationPage({ employees }: AllocationPageProps) {
     [employees]
   )
 
+  const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const assignmentHistory = loadFromLocalStorage<AssignmentHistoryEntry[]>(
+    STORAGE_KEYS.assignmentHistory,
+    [],
+  )
+
 useEffect(() => {
   saveToLocalStorage(STORAGE_KEYS.allocationState, { slots, specialTasks })
 }, [slots, specialTasks])
+
+  useEffect(() => {
+    const todayEntries: AssignmentHistoryEntry[] = [
+      ...slots
+        .filter((slot) => slot.active && slot.assignetEmployeeId)
+        .map((slot) => ({
+          date: today,
+          employeeId: slot.assignetEmployeeId as string,
+          taskId: slot.id,
+        })),
+      ...specialTasks
+        .filter((task) => task.active && task.assignedEmployeeId)
+        .map((task) => ({
+          date: today,
+          employeeId: task.assignedEmployeeId as string,
+          taskId: task.id,
+        })),
+    ]
+
+    const previousEntries = assignmentHistory.filter((entry) => entry.date !== today)
+
+    saveToLocalStorage(STORAGE_KEYS.assignmentHistory, [
+      ...previousEntries,
+      ...todayEntries,
+    ])
+  }, [assignmentHistory, slots, specialTasks, today])
 
 
   const handleToggleSlot = (slotId: string) => {
@@ -144,48 +179,63 @@ useEffect(() => {
   // }
 
   const handleAllocate = () => {
-    const assignedIds = new Set(
-      [
-        ...slots.map((slot) => slot.assignetEmployeeId),
-        ...specialTasks.map((task) => task.assignedEmployeeId),
-      ].filter((employeeId): employeeId is string => Boolean(employeeId))
-    )
+    const plannerTasks: RotationTask[] = [
+      ...specialTasks
+        .filter((task) => task.active)
+        .map((task) => ({
+          id: task.id,
+          name: `${task.group} - ${task.name}`,
+          priority: 2,
+          requiredTraining:
+            task.group === 'Problem Solving'
+              ? 'Problem Solving'
+              : task.group === 'Divert'
+                ? 'Divert'
+                : task.group.startsWith('Induct')
+                  ? 'Induct'
+                  : undefined,
+        })),
+      ...slots
+        .filter((slot) => slot.active)
+        .map((slot) => ({
+          id: slot.id,
+          name: `Slot ${slot.area} ${slot.aisle}-${slot.location}`,
+          priority: 1,
+        })),
+    ]
 
-    const remainingEmployees = activeEmployees.filter(
-      (employee) => !assignedIds.has(employee.id)
-    )
-
-    let employeeIndex = 0
-    const nextSpecialTasks = specialTasks.map((task) => {
-      if (!task.active || task.assignedEmployeeId) {
-        return task
-      }
-
-      const employee = remainingEmployees[employeeIndex]
-      employeeIndex += 1
-
-      return {
-        ...task,
-        assignedEmployeeId: employee?.id ?? null,
-      }
+    const plannerResult = planAssignments({
+      employees: activeEmployees,
+      tasks: plannerTasks,
+      date: today,
+      history: assignmentHistory,
     })
 
-    const nextSlots = slots.map((slot) => {
-      if (!slot.active || slot.assignetEmployeeId) {
-        return slot
-      }
+    const assignmentMap = new Map(
+      plannerResult.assignments.map((assignment) => [assignment.taskId, assignment.employeeId] as const)
+    )
 
-      const employee = remainingEmployees[employeeIndex]
-      employeeIndex += 1
+    setSpecialTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        task.active
+          ? {
+              ...task,
+              assignedEmployeeId: assignmentMap.get(task.id) ?? null,
+            }
+          : task
+      )
+    )
 
-      return {
-        ...slot,
-        assignetEmployeeId: employee?.id ?? null,
-      }
-    })
-
-    setSpecialTasks(nextSpecialTasks)
-    setSlots(nextSlots)
+    setSlots((currentSlots) =>
+      currentSlots.map((slot) =>
+        slot.active
+          ? {
+              ...slot,
+              assignetEmployeeId: assignmentMap.get(slot.id) ?? null,
+            }
+          : slot
+      )
+    )
   }
 
   const handleToggleSpecialTask = (taskId: string) => {
@@ -235,16 +285,7 @@ useEffect(() => {
   }
 
   const handleSaveManualAssignments = (assignments: Record<string, string | null>) => {
-    setSlots((currentSlots) =>
-      currentSlots.map((slot) =>
-        Object.prototype.hasOwnProperty.call(assignments, slot.id)
-          ? {
-              ...slot,
-              assignetEmployeeId: assignments[slot.id] ?? null,
-            }
-          : slot
-      )
-    )
+    setSlots((currentSlots) => applyManualAssignmentsToSlots(currentSlots, assignments))
   }
 
   const handleResetAll = () => {

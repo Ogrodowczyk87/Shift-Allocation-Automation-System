@@ -5,6 +5,8 @@ import type { Employee, Slot, SpecialTask } from '../../models/Employee'
 import { TRAININGS_OPTIONS } from '../../models/Employee'
 import { STORAGE_KEYS } from '../../services/storage/keys'
 import { loadFromLocalStorage } from '../../services/storage/localStorage'
+import { planAssignments } from './rotation/rotation-planner'
+import type { AssignmentHistoryEntry, RotationTask } from './rotation/rotation.types'
 
 type DashboardPageProps = {
   employees: Employee[]
@@ -20,6 +22,8 @@ const EMPTY_ALLOCATION_SNAPSHOT: AllocationSnapshot = {
   specialTasks: [],
 }
 
+const EMPTY_ASSIGNMENT_HISTORY: AssignmentHistoryEntry[] = []
+
 const formatToday = () =>
   new Intl.DateTimeFormat('en-GB', {
     weekday: 'long',
@@ -34,6 +38,10 @@ export function DashboardPage({ employees }: DashboardPageProps) {
   const allocationSnapshot = loadFromLocalStorage<AllocationSnapshot>(
     STORAGE_KEYS.allocationState,
     EMPTY_ALLOCATION_SNAPSHOT,
+  )
+  const assignmentHistory = loadFromLocalStorage<AssignmentHistoryEntry[]>(
+    STORAGE_KEYS.assignmentHistory,
+    EMPTY_ASSIGNMENT_HISTORY,
   )
 
   const activeEmployees = employees.filter((employee) => employee.status === 'active')
@@ -52,7 +60,7 @@ export function DashboardPage({ employees }: DashboardPageProps) {
   const totalAssignedAssignments = assignedSlots.length + assignedSpecialTasks.length
   const totalPlannedAssignments = activeSlots.length + activeSpecialTasks.length
 
-  const rotationCompliance =
+  const coveragePercentage =
     totalPlannedAssignments === 0
       ? 0
       : Math.round((totalAssignedAssignments / totalPlannedAssignments) * 100)
@@ -81,6 +89,37 @@ export function DashboardPage({ employees }: DashboardPageProps) {
     })),
   ]
 
+  const plannerTasks: RotationTask[] = [
+    ...activeSlots.map((slot) => ({
+      id: slot.id,
+      name: `Slot ${slot.area} ${slot.aisle}-${slot.location}`,
+      priority: 1,
+    })),
+    ...activeSpecialTasks.map((task) => ({
+      id: task.id,
+      name: `${task.group} - ${task.name}`,
+      priority: 2,
+    })),
+  ]
+
+  const plannerResult = planAssignments({
+    employees: presentEmployees,
+    tasks: plannerTasks,
+    date: new Date().toISOString().slice(0, 10),
+    history: assignmentHistory,
+  })
+
+  const rotationCompliantAssignments = plannerResult.assignments.filter(
+    (assignment) => assignment.status !== 'OPEN',
+  ).length
+
+  const rotationCompliancePercentage =
+    plannerResult.assignments.length === 0
+      ? 100
+      : Math.round(
+          (rotationCompliantAssignments / plannerResult.assignments.length) * 100,
+        )
+
   const assignmentPressure = presentEmployees.length - totalPlannedAssignments
   const planningDay = formatToday()
 
@@ -91,11 +130,14 @@ export function DashboardPage({ employees }: DashboardPageProps) {
       ['Present in pool', presentEmployees.length],
       ['Inactive employees', employees.length - activeEmployees.length],
       ['Open assignments', totalOpenAssignments],
-      ['Coverage', `${rotationCompliance}%`],
+      ['Coverage', `${coveragePercentage}%`],
+      ['Rotation compliance', `${rotationCompliancePercentage}%`],
       ['Active slots', activeSlots.length],
       ['Active special tasks', activeSpecialTasks.length],
       ['Assigned now', totalAssignedAssignments],
       ['Employees without training', employeesWithoutTraining.length],
+      ['Rotation open assignments', plannerResult.openTasks.length],
+      ['Rotation unassigned employees', plannerResult.unassignedEmployees.length],
       [
         'Assignment pressure',
         assignmentPressure >= 0
@@ -129,7 +171,7 @@ export function DashboardPage({ employees }: DashboardPageProps) {
     const link = document.createElement('a')
 
     link.href = url
-      link.download = `dashboard-overview-${new Date().toISOString().slice(0, 10)}.csv`
+    link.download = `dashboard-overview-${new Date().toISOString().slice(0, 10)}.csv`
     link.click()
 
     URL.revokeObjectURL(url)
@@ -137,7 +179,7 @@ export function DashboardPage({ employees }: DashboardPageProps) {
 
   return (
     <section className="space-y-6">
-      <header className="rounded-2xl border border-sky-200 bg-gradient-to-r from-white via-sky-50 to-cyan-50 p-6 shadow-sm">
+      <header className="rounded-2xl border border-sky-200  from-white via-sky-50 to-cyan-50 p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Dashboard</p>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -186,9 +228,17 @@ export function DashboardPage({ employees }: DashboardPageProps) {
 
         <Card>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Coverage</p>
-          <p className="mt-3 text-3xl font-bold text-emerald-600">{rotationCompliance}%</p>
+          <p className="mt-3 text-3xl font-bold text-emerald-600">{coveragePercentage}%</p>
           <p className="mt-2 text-sm text-slate-600">
             {totalAssignedAssignments} of {totalPlannedAssignments} active assignments are currently filled.
+          </p>
+        </Card>
+
+        <Card>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Rotation compliance</p>
+          <p className="mt-3 text-3xl font-bold text-sky-600">{rotationCompliancePercentage}%</p>
+          <p className="mt-2 text-sm text-slate-600">
+            {plannerResult.openTasks.length} assignments would remain open when rotation rules are applied.
           </p>
         </Card>
       </section>
@@ -253,6 +303,43 @@ export function DashboardPage({ employees }: DashboardPageProps) {
                     </span>
                   </li>
                 ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="mt-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Rotation-blocked or unassigned pool
+              </h3>
+              <span className="text-sm text-slate-500">{plannerResult.unassignedEmployees.length} people</span>
+            </div>
+
+            {plannerResult.unassignedEmployees.length === 0 ? (
+              <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                No one is left unassigned by the current rotation rules.
+              </div>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {plannerResult.unassignedEmployees.map((item) => {
+                  const employee = presentEmployees.find((person) => person.id === item.employeeId)
+
+                  return (
+                    <li
+                      key={item.employeeId}
+                      className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+                    >
+                      <p className="text-sm font-medium text-slate-900">
+                        {employee ? `${employee.firstName} ${employee.lastName}` : item.employeeId}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {item.reasons.length > 0
+                          ? item.reasons.join(', ')
+                          : 'No automatic assignment available'}
+                      </p>
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </div>
