@@ -27,6 +27,12 @@ export function SpecialTasksBoard({ tasks, employeesById }: SpecialTasksBoardPro
     Support: activeTasks.filter((task) => task.group === 'Support'),
   }
 
+  const groupedInductTasks = {
+    'Induct 1': activeTasks.filter((task) => task.group === 'Induct 1'),
+    'Induct 4-5': activeTasks.filter((task) => task.group === 'Induct 4-5'),
+    'Induct 6-7': activeTasks.filter((task) => task.group === 'Induct 6-7'),
+  }
+
   const renderTask = (task: SpecialTask) => {
     const assignedEmployee = task.assignedEmployeeId
       ? employeesById.get(task.assignedEmployeeId)
@@ -71,19 +77,42 @@ export function SpecialTasksBoard({ tasks, employeesById }: SpecialTasksBoardPro
       {activeTasks.length === 0 ? (
         <p className="mt-4 text-sm text-slate-500">No special roles selected for today.</p>
       ) : (
-        <div className="mt-4 grid gap-4 lg:grid-cols-4">
-          {Object.entries(groupedTasks).map(([groupName, groupTasks]) => (
-            <div key={groupName}>
-              <h3 className="mb-3 text-sm font-semibold text-slate-700">{groupName}</h3>
-              <div className="space-y-3">
-                {groupTasks.length === 0 ? (
-                  <p className="text-sm text-slate-400">No active roles</p>
-                ) : (
-                  groupTasks.map(renderTask)
-                )}
-              </div>
+        <div className="mt-4 space-y-6">
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Special Roles</h3>
+            <div className="grid gap-4 lg:grid-cols-4">
+              {Object.entries(groupedTasks).map(([groupName, groupTasks]) => (
+                <div key={groupName}>
+                  <h4 className="mb-3 text-sm font-semibold text-slate-700">{groupName}</h4>
+                  <div className="space-y-3">
+                    {groupTasks.length === 0 ? (
+                      <p className="text-sm text-slate-400">No active roles</p>
+                    ) : (
+                      groupTasks.map(renderTask)
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Induct Tasks</h3>
+            <div className="grid gap-4 lg:grid-cols-3">
+              {Object.entries(groupedInductTasks).map(([groupName, groupTasks]) => (
+                <div key={groupName}>
+                  <h4 className="mb-3 text-sm font-semibold text-slate-700">{groupName}</h4>
+                  <div className="space-y-3">
+                    {groupTasks.length === 0 ? (
+                      <p className="text-sm text-slate-400">No active roles</p>
+                    ) : (
+                      groupTasks.map(renderTask)
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </section>

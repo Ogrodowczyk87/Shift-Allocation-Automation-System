@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import type { Employee, Slot, SpecialTask } from '../../models/Employee'
 // import { ActiveEmployeesPanel } from './components/ActiveEmployeesPanel'
 import { AllocationToolbar } from './components/AllocationToolbar'
-import { loadFromLocalStorage } from '../../services/storage/localStorage'
 import { STORAGE_KEYS } from '../../services/storage/keys'
+import { loadFromLocalStorage } from '../../services/storage/localStorage'
 import { AllocationSetupTab } from './components/AllocationSetupTab'
 import { AllocationBoardTab } from './components/AllocationBoardTab'
 import { ManualSlotAssignmentModal } from './components/ManualSlotAssignmentModal'
@@ -197,19 +197,25 @@ export function AllocationPage({ employees }: AllocationPageProps) {
     const plannerTasks: RotationTask[] = [
       ...specialTasks
         .filter((task) => task.active)
-        .map((task) => ({
-          id: task.id,
-          name: `${task.group} - ${task.name}`,
-          priority: 2,
-          requiredTraining:
+        .map((task) => {
+          const requiredTraining =
             task.group === 'Problem Solving'
               ? 'Problem Solving'
               : task.group === 'Divert'
                 ? 'Divert'
                 : task.group.startsWith('Induct')
                   ? 'Induct'
-                  : undefined,
-        })),
+                  : undefined
+
+          return {
+            id: task.id,
+            name: `${task.group} - ${task.name}`,
+            // Fill training-gated work first so certified people are not consumed
+            // by generic special tasks before Induct/Divert/Problem Solving.
+            priority: requiredTraining ? 3 : 2,
+            requiredTraining,
+          }
+        }),
       ...slots
         .filter((slot) => slot.active)
         .map((slot) => ({

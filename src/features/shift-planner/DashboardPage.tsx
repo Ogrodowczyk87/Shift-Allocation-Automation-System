@@ -121,11 +121,23 @@ export function DashboardPage({ employees }: DashboardPageProps) {
       name: `Slot ${slot.area} ${slot.aisle}-${slot.location}`,
       priority: 1,
     })),
-    ...activeSpecialTasks.map((task) => ({
-      id: task.id,
-      name: `${task.group} - ${task.name}`,
-      priority: 2,
-    })),
+    ...activeSpecialTasks.map((task) => {
+      const requiredTraining =
+        task.group === 'Problem Solving'
+          ? 'Problem Solving'
+          : task.group === 'Divert'
+            ? 'Divert'
+            : task.group.startsWith('Induct')
+              ? 'Induct'
+              : undefined
+
+      return {
+        id: task.id,
+        name: `${task.group} - ${task.name}`,
+        priority: requiredTraining ? 3 : 2,
+        requiredTraining,
+      }
+    }),
   ]
 
   const plannerResult = planAssignments({
