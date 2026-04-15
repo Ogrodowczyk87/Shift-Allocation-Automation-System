@@ -4,7 +4,7 @@ import { AddEmpyeeCard } from "./components/AddEmpyeeCard"
 import { AddEmployeeModal } from "./components/AddEmployeeModal"
 
 type Props = {
-  onAddEmployee: (employee: Employee) => void
+  onAddEmployee: (employee: Employee) => Promise<void> | void
   existingEmployeeIds: string[]
 }
 

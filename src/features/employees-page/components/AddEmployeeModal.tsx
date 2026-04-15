@@ -4,15 +4,15 @@ import { AddEmployeeForm } from "./AddEmployeeForm"
 type Props = {
   isOpen: boolean
   onClose: () => void
-  onAddEmployee: (employee: Employee) => void
+  onAddEmployee: (employee: Employee) => Promise<void> | void
   existingEmployeeIds: string[]
 }
 
 export function AddEmployeeModal({ isOpen, onClose, onAddEmployee, existingEmployeeIds }: Props) {
   if (!isOpen) return null
 
-  const handleSubmit = (employee: Employee) => {
-    onAddEmployee(employee)
+  const handleSubmit = async (employee: Employee) => {
+    await onAddEmployee(employee)
     onClose()
   }
 

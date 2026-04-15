@@ -7,7 +7,7 @@ import { buildEmployeeAvatarUrl } from "../../../utils/employeeAvatar"
 
 type AddEmployeeFormProps = {
   onCancel: () => void
-  onSubmit: (employee: Employee) => void
+  onSubmit: (employee: Employee) => Promise<void> | void
   existingEmployeeIds: string[]
 }
 
@@ -18,8 +18,9 @@ export function AddEmployeeForm({ onCancel, onSubmit, existingEmployeeIds }: Add
   const [photoUrl, setPhotoUrl] = useState("")
   const [trainings, setTrainings] = useState<Training[]>([])
   const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   
-  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault()
     const normalizedFirstName = firstName.trim()
     const normalizedLastName = lastName.trim()
@@ -38,22 +39,30 @@ export function AddEmployeeForm({ onCancel, onSubmit, existingEmployeeIds }: Add
     }
 
     setError("")
+    setIsSubmitting(true)
 
-    onSubmit({
-      id: normalizedId,
-      firstName: normalizedFirstName,
-      lastName: normalizedLastName,
-      photoUrl:
-        photoUrl.trim() ||
-        buildEmployeeAvatarUrl({
-          id: normalizedId,
-          firstName: normalizedFirstName,
-          lastName: normalizedLastName,
-        }),
-      trainings,
-      status: "active",
-      active: false,
-    })
+    try {
+      await onSubmit({
+        id: normalizedId,
+        firstName: normalizedFirstName,
+        lastName: normalizedLastName,
+        photoUrl:
+          photoUrl.trim() ||
+          buildEmployeeAvatarUrl({
+            id: normalizedId,
+            firstName: normalizedFirstName,
+            lastName: normalizedLastName,
+          }),
+        trainings,
+        status: "active",
+        active: false,
+      })
+    } catch (submitError) {
+      console.error(submitError)
+      setError("Failed to add employee. Please check backend and database setup.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
   
   const toggleTraining = (training: Training) => {
@@ -64,7 +73,7 @@ export function AddEmployeeForm({ onCancel, onSubmit, existingEmployeeIds }: Add
 
   return (
    <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-      <PhotoUpload onChange={setPhotoUrl} />
+      <PhotoUpload employeeId={id} onChange={setPhotoUrl} />
 
       <input value={firstName} onChange={(e) => {
         setFirstName(e.target.value)
@@ -101,7 +110,13 @@ export function AddEmployeeForm({ onCancel, onSubmit, existingEmployeeIds }: Add
       </div>
       <div className="pt-2">
         <button type="button" onClick={onCancel} className="rounded-md bg-slate-200 px-4 py-2">Cancel</button>
-        <button type="submit" className="ml-2 rounded-md bg-sky-500 px-4 py-2 text-white">Add</button>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="ml-2 rounded-md bg-sky-500 px-4 py-2 text-white disabled:opacity-50"
+        >
+          {isSubmitting ? 'Adding...' : 'Add'}
+        </button>
       </div>
     </form>
   )
