@@ -1,68 +1,77 @@
 # Shift Allocation Automation System
 
-A work-in-progress operations app for employee pool management, daily allocation, and shift coverage overview.
+Shift Allocation Automation System is a full-stack warehouse operations app for employee management, daily shift allocation, task rotation, and coverage monitoring.
 
-## Project Goal
+The project is designed to replace spreadsheet-based shift planning with a clearer workflow backed by persistent data and AWS infrastructure.
 
-The goal of this project is to replace spreadsheet-style shift coordination with one clearer workflow:
+## Features
 
-- manage employees and their training records
-- add available people to the daily pool
-- activate slots and special tasks for the current shift
-- assign employees to active work areas
-- review coverage and export the result
+- employee list with filtering and pool selection
+- add employee flow with training tags and photo support
+- allocation board for slots and special tasks
+- induct task support and grouped board display
+- automatic allocation with rotation rules
+- manual slot assignment
+- assignment history stored in PostgreSQL
+- dashboard with coverage and rotation compliance overview
+- CSV export for planner output
 
-## Current Product Scope
+## Current Architecture
 
-The application currently includes these main areas:
-
-- `Dashboard`: operational overview with live coverage, open work, and readiness summary
-- `Employees`: employee list, filters, and add-to-pool workflow
-- `Allocation`: slot activation, special task activation, automatic allocation, manual slot assignment, CSV export, and reset flow
-- `Settings`: placeholder page for future configuration
-
-Removed placeholders:
-
-- `History`
-- `Reports`
-
-## Current Status
-
-This is an MVP frontend in active development, with a backend foundation now being added.
-
-What already works:
-
-- employee management in the frontend
-- daily pool selection
-- allocation setup and board split into separate tabs
-- manual employee assignment to active slots
-- allocation reset and CSV export
-- dashboard overview based on current allocation state
-
-What is still in progress:
-
-- persistent backend-driven data
-- authentication and authorization
-- production database integration
-- AWS deployment
-
-## Tech Stack
-
-Frontend:
+### Frontend
 
 - React 19
 - TypeScript
 - Vite 7
 - Tailwind CSS 4
-- ESLint 9
 
-Backend foundation:
+### Backend
 
 - Node.js
-- Express
+- Express 5
 - Apollo Server
 - GraphQL
 - PostgreSQL client (`pg`)
+
+### AWS / Cloud
+
+- Amazon RDS PostgreSQL for persistent data
+- AWS App Runner for backend hosting
+- planned: Amazon S3 for employee photo storage
+- planned: AWS Amplify for frontend hosting
+- planned: Amazon Cognito for authentication
+
+## Product Areas
+
+- `Dashboard`  
+  coverage, open work, rotation compliance, planner summary
+
+- `Employees`  
+  employee list, filters, add employee flow, add-to-pool selection
+
+- `Allocation`  
+  slot activation, special task activation, induct task handling, auto allocation, manual assignment, CSV export
+
+- `Settings`  
+  placeholder for future configuration
+
+## What Works Now
+
+- backend and frontend build successfully
+- GraphQL API is connected to PostgreSQL / RDS
+- assignment history is persisted in the database
+- dashboard reads assignment history from the backend
+- allocation flow saves history through GraphQL
+- rotation blocks repeating the same task on consecutive days
+- backend is deployable on AWS App Runner
+
+## In Progress
+
+- persistent employee storage end-to-end
+- employee photo upload to S3
+- frontend deployment to AWS Amplify
+- Cognito login and route/API protection
+- tighter AWS networking and security hardening
 
 ## Local Development
 
@@ -73,14 +82,14 @@ Requirements:
 - Node.js 20+
 - npm
 
-Run the frontend:
+Run:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Useful frontend scripts:
+Useful commands:
 
 ```bash
 npm run build
@@ -88,11 +97,21 @@ npm run preview
 npm run lint
 ```
 
+Frontend environment:
+
+```env
+VITE_API_URL=http://localhost:4000/graphql
+```
+
 ### Backend
 
-The backend scaffold lives in `src/server`.
+Backend lives in:
 
-Run the backend:
+```text
+src/server
+```
+
+Run:
 
 ```bash
 cd src/server
@@ -100,17 +119,26 @@ npm install
 npm run dev
 ```
 
-Current backend endpoints:
+Build:
 
-- `GET /health`
-- `POST /graphql`
+```bash
+cd src/server
+npm run build
+```
 
-The backend expects an `.env` file in `src/server/` with:
+Backend environment example:
 
 ```env
 PORT=4000
-DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DB_NAME
+DATABASE_URL=postgres://USER:PASSWORD@HOST:5432/postgres
+AWS_REGION=eu-west-1
+S3_BUCKET_NAME=YOUR_EMPLOYEE_PHOTOS_BUCKET
 ```
+
+## Backend Endpoints
+
+- `GET /health`
+- `POST /graphql`
 
 Example health check:
 
@@ -118,69 +146,94 @@ Example health check:
 curl http://localhost:4000/health
 ```
 
-## GraphQL Foundation
+## GraphQL Scope
 
-The initial backend setup includes:
+Current GraphQL includes:
 
-- a GraphQL schema for `Employee`
-- a `health` query
-- an `employees` query
-- an `addEmployee` mutation
+- `health`
+- `employees`
+- `assignmentHistory(date)`
+- `addEmployee`
+- `archiveEmployee`
+- `createEmployeePhotoUpload`
+- `saveAssignmentHistory`
 
-Current server structure:
+## Database
+
+The backend uses PostgreSQL and currently includes:
+
+- `employees`
+- `assignment_history`
+
+SQL files:
 
 ```text
-src/server/
-  src/
-    index.ts
-    db/
-      client.ts
-    schema/
-      typeDefs.ts
-      resolvers.ts
+src/server/sql/create-assignment-history.sql
+src/server/sql/alter-employees-for-production.sql
 ```
 
-## Frontend Structure
+Migration scripts:
+
+```text
+src/server/scripts/run-assignment-history-migration.ts
+src/server/scripts/run-employees-migration.ts
+```
+
+## Project Structure
 
 ```text
 src/
   app/
-    layout/                 # app shell, sidebar, page types
+    layout/
   components/
-    ui/                     # shared UI components
+    ui/
   features/
-    AllocationPage/         # daily slot and task allocation
-    employees-page/         # employee list and add employee flow
-    setting-page/           # future app settings
-    shift-planner/          # dashboard / overview module
-  models/                   # shared domain types
-  services/                 # local storage utilities
-  utils/                    # helper functions
-  App.tsx                   # top-level page mapping
+    AllocationPage/
+    employees-page/
+    setting-page/
+    shift-planner/
+  models/
+  services/
+    api/
+    storage/
+  utils/
+  App.tsx
+
+src/server/
+  src/
+    db/
+    schema/
+    storage/
+    index.ts
+  scripts/
+  sql/
 ```
 
-## Architecture Notes
+## AWS Deployment Status
 
-- The frontend is feature-based.
-- The current frontend still uses local state and local storage for the main allocation workflow.
-- The backend is being introduced incrementally instead of replacing everything at once.
-- The long-term target is AWS deployment with managed persistence and Cognito-based authentication.
+### Already done
 
-## Planned Next Steps
+- RDS PostgreSQL instance created
+- App Runner backend deployment tested successfully
+- backend `/health` confirmed against RDS
 
-- connect frontend employee data to the backend
-- move allocation state from local storage to the backend
-- add PostgreSQL persistence
-- add authentication with Amazon Cognito
-- deploy frontend and backend to AWS
+### Planned next steps
 
-## Portfolio Context
+- create S3 bucket for employee photos
+- configure App Runner IAM access to S3
+- deploy frontend with Amplify
+- connect frontend environment to App Runner GraphQL URL
+- add Cognito authentication
 
-This project is intended to solve a real operational problem and to serve as a fullstack learning project.
-It is intentionally being developed in stages:
+## Roadmap
 
-1. working frontend MVP
-2. backend foundation
-3. database integration
-4. authentication
-5. AWS deployment
+1. finish persistent employee flow
+2. finish S3 photo upload
+3. deploy frontend to Amplify
+4. add Cognito authentication
+5. add CI/CD and automatic deployments
+6. harden production networking and secrets management
+
+## CV / Portfolio Summary
+
+Full-stack warehouse shift planning application built with React, TypeScript, Node.js, Express, GraphQL, PostgreSQL and AWS. Includes employee management, allocation planning, task rotation rules, dashboard reporting, and cloud deployment architecture using RDS, App Runner, S3, Amplify and Cognito.
