@@ -23,7 +23,7 @@ function App() {
   const signOutRedirect = () => {
     const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID
     const logoutUri = import.meta.env.VITE_COGNITO_LOGOUT_URI
-    const cognitoDomain = import.meta.env.VITE_COGNITO_AUTHORITY
+const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN
 
     setAccessToken(null)
     void auth.removeUser()
