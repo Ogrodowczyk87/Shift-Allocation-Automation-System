@@ -10,6 +10,11 @@ import { db } from './db/client.js'
 const app = express()
 const port = Number(process.env.PORT) || 4000
 
+const allowedOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
 async function startServer() {
   const apolloServer = new ApolloServer({
     typeDefs,
@@ -18,7 +23,19 @@ async function startServer() {
 
   await apolloServer.start()
 
-  app.use(cors())
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true)
+          return
+        }
+
+        callback(new Error('Not allowed by CORS'))
+      },
+    })
+  )
+
   app.use(express.json())
 
   app.get('/health', async (_req, res) => {

@@ -11,6 +11,8 @@ export function PhotoUpload({ employeeId, onChange }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [fileName, setFileName] = useState('')
   const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState('')
+  const maxSizeBytes = 5 * 1024 * 1024
 
   const handlePick = () => inputRef.current?.click()
 
@@ -18,16 +20,26 @@ export function PhotoUpload({ employeeId, onChange }: Props) {
     const file = e.target.files?.[0]
     if (!file || !employeeId.trim()) return
 
-    setIsUploading(true)
+    setError('')
 
     try {
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Only image files are allowed.')
+      }
+
+      if (file.size > maxSizeBytes) {
+        throw new Error('Image must be smaller than 5 MB.')
+      }
+
+      setIsUploading(true)
+
       const { uploadUrl, fileUrl } = await createEmployeePhotoUpload(
         file.name,
         file.type,
         employeeId.trim()
       )
 
-      await fetch(uploadUrl, {
+      const uploadResponse = await fetch(uploadUrl, {
         method: 'PUT',
         headers: {
           'Content-Type': file.type,
@@ -35,11 +47,23 @@ export function PhotoUpload({ employeeId, onChange }: Props) {
         body: file,
       })
 
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload image.')
+      }
+
       setFileName(file.name)
       setPreviewUrl(fileUrl)
       onChange?.(fileUrl)
+    } catch (error) {
+      setFileName('')
+      setPreviewUrl(null)
+      onChange?.('')
+      setError(error instanceof Error ? error.message : 'Upload failed.')
     } finally {
       setIsUploading(false)
+      if (inputRef.current) {
+        inputRef.current.value = ''
+      }
     }
   }
 
@@ -64,15 +88,16 @@ export function PhotoUpload({ employeeId, onChange }: Props) {
         {isUploading ? 'Uploading...' : 'Upload photo'}
       </button>
 
-      {fileName && <p className="text-xs text-slate-500">{fileName}</p>}
+      {fileName ? <p className="text-xs text-slate-500">{fileName}</p> : null}
+      {error ? <p className="text-xs text-rose-600">{error}</p> : null}
 
-      {previewUrl && (
+      {previewUrl ? (
         <img
           src={previewUrl}
           alt="Preview"
           className="h-24 w-24 rounded-full object-cover ring-2 ring-sky-200"
         />
-      )}
+      ) : null}
     </div>
   )
 }

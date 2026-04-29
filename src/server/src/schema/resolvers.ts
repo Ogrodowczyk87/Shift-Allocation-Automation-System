@@ -163,12 +163,35 @@ export const resolvers = {
     },
 
     createEmployeePhotoUpload: async (_parent: unknown, args: CreateEmployeePhotoUploadArgs) => {
+      const allowedMimeTypes = new Set([
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+        'image/heic',
+        'image/heif',
+      ])
+
+      const normalizedEmployeeId = args.employeeId.trim()
+
+      if (!normalizedEmployeeId) {
+        throw new Error('Employee ID is required.')
+      }
+
+      if (!/^[a-zA-Z0-9_-]+$/.test(normalizedEmployeeId)) {
+        throw new Error('Invalid employee ID.')
+      }
+
+      if (!allowedMimeTypes.has(args.fileType)) {
+        throw new Error('Unsupported image type.')
+      }
+
       const fileExtension = args.fileName.includes('.')
         ? args.fileName.split('.').pop()
         : 'jpg'
 
       const safeExtension = fileExtension?.toLowerCase() ?? 'jpg'
-      const fileKey = `employees/${args.employeeId}/${randomUUID()}.${safeExtension}`
+      const fileKey = `employees/${normalizedEmployeeId}/${randomUUID()}.${safeExtension}`
 
       return createEmployeePhotoUpload({
         fileKey,
