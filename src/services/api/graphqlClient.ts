@@ -1,3 +1,5 @@
+import { getAccessToken } from '../tokenStore'
+
 const GRAPHQL_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000/graphql'
 
 type GraphQLError = {
@@ -13,11 +15,19 @@ export async function graphqlRequest<T>(
   query: string,
   variables?: Record<string, unknown>
 ): Promise<T> {
+  const token = getAccessToken()
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
   const response = await fetch(GRAPHQL_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({
       query,
       variables,
