@@ -71,15 +71,15 @@ const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN
     return <div className="p-6 text-sm text-slate-600">Loading authentication...</div>
   }
 
-  if (auth.error) {
-    return (
-      <div className="p-6 text-sm text-rose-600">
-        Authentication error: {auth.error.message}
-      </div>
-    )
-  }
-
   if (!auth.isAuthenticated) {
+    if (auth.error) {
+      return (
+        <div className="p-6 text-sm text-rose-600">
+          Authentication error: {auth.error.message}
+        </div>
+      )
+    }
+
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-100 p-6">
         <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
